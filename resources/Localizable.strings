@@ -1,0 +1,13 @@
+Answer_type=Answer type
+Answers=Answers
+Checkboxes=Checkboxes  (multi-choice)
+Number_of_answers=Number of answers
+Question=Question
+Radio_group=Radio group (single-choice)
+Textarea=Textarea
+add_answers_to_question=\  Add  
+add_questions_to_form=\  Add  
+back=\  Back  
+forward=\  Forward  
+iw.component.com.idega.block.survey.presentation.Survey.name=Survey
+save=\  Save  
