@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project>
+<project xmlns:j="jelly:core">
   <extend>${base.project.dir}/block-dependencies.xml</extend>
   <pomVersion>3</pomVersion>
   <name>idegaWeb Survey Block</name>
@@ -39,6 +39,7 @@
     </developer>
   </developers>
   <dependencies>
+    
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.core</artifactId>
@@ -48,9 +49,13 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <eclipse.dependency>true</eclipse.dependency>
+        <j:if test="${idegaweb.project.source.dependent}=='true'}">
+          <eclipse.dependency>true</eclipse.dependency>
+        </j:if>
       </properties>
-    </dependency>
+    </dependency>    
+    
+    
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.category</artifactId>
@@ -60,9 +65,14 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <eclipse.dependency>true</eclipse.dependency>
+        <j:if test="${idegaweb.project.source.dependent}=='true'}">
+          <eclipse.dependency>true</eclipse.dependency>
+        </j:if>
       </properties>
     </dependency>
+    
+    
+    
   </dependencies>
   <build>
     <sourceDirectory>src/java</sourceDirectory>
