@@ -8,7 +8,6 @@ package com.idega.block.survey.presentation;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +70,6 @@ public class Survey extends FolderBlock {
 	protected IWBundle _iwb;
 	protected IWBundle _iwbSurvey;
 	private Locale _iLocaleID;
-	private IWTimestamp _date;
 	
 	public final static String STYLE = "font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;";
 	public final static String STYLE_2 = "font-family:arial; font-size:8pt; color:#000000; text-align: justify;";
@@ -96,7 +94,6 @@ public class Survey extends FolderBlock {
 	private int _lastAction = ACTION_NO_ACTION;
 	
 	private Vector prmVector = new Vector();
-	private HashMap _prmValues = new HashMap();
 	private QueueMap _reply = new QueueMap();
 	
 	private SurveyBusiness _sBusiness = null;
@@ -120,8 +117,6 @@ public class Survey extends FolderBlock {
 //	private String style_textbox;
 //	private String style_textarea;
 	private String style_submitbutton = "font-family:arial; font-size:8pt; color:#000000; text-align: center; border: 1 solid #000000;";
-	private String style_form_element = "font-family:arial; font-size:8pt; color:#000000; text-align: justify;";
-	
 	public final static String MODE_EDIT = "edit";
 	public static final String MODE_SURVEY = "survey";
 	public static final String MODE_RESULTS = "results";
@@ -159,7 +154,6 @@ public class Survey extends FolderBlock {
 		_iwb = iwc.getIWMainApplication().getBundle(IW_CORE_BUNDLE_IDENTIFIER);
 		_iwbSurvey = getBundle(iwc);
 		_iLocaleID = iwc.getCurrentLocale();
-		_date = new IWTimestamp();
 			
 		processParameters(iwc);
 		
@@ -249,33 +243,6 @@ public class Survey extends FolderBlock {
 		}
 		_surveyAnswerDifference = allQuestions;		
 	}
-	
-	private void processParameterValues(IWContext iwc, String prmName, boolean maintain){
-		String[] values = iwc.getParameterValues(prmName);
-		if(values != null && values.length > 0){
-			_prmValues.put(prmName,values);
-			if(maintain){
-				for (int i = 0; i < values.length; i++) {
-					if(values[i] != null && !"".equals(values[i])){
-						prmVector.add(new Parameter(prmName+PRM_MAINTAIN_SUFFIX,values[i]));
-					}
-				}
-			}
-		} else {
-			values = iwc.getParameterValues(prmName+PRM_MAINTAIN_SUFFIX);
-			if(values != null && values.length > 0){
-				_prmValues.put(prmName,values);
-				if(maintain){
-					for (int i = 0; i < values.length; i++) {
-						if(values[i] != null && !"".equals(values[i])){
-							prmVector.add(new Parameter(prmName+PRM_MAINTAIN_SUFFIX,values[i]));
-						}
-					}
-				}
-			}	
-		}
-	}
-
 	
 	public void main(IWContext iwc) throws Exception {
 		if(_mode.equals(MODE_EDIT)){
@@ -772,34 +739,9 @@ public class Survey extends FolderBlock {
 		return table;
 	}
 	
-	private PresentationObject getEditLink(){
-		if(_currentSurvey != null){
-			Image editImage = _iwb.getImage("shared/edit.gif");
-			Link adminLink = new Link(editImage);
-			adminLink.addParameter(PRM_SWITCHTO_MODE,MODE_EDIT);
-			adminLink.addParameter(SurveyEditor.PRM_SURVEY_ID,_currentSurvey.getPrimaryKey().toString());
-			return adminLink;
-		} else {
-			return NULL_CLONE_OBJECT;
-		}
-
-	}
-	
-	private PresentationObject getCreateLink(){
-		
-		Image createImage = _iwb.getImage("shared/create.gif");
-		Link createLink = new Link(createImage);
-		createLink.addParameter(PRM_SWITCHTO_MODE,MODE_EDIT);
-		
-		return createLink;
-
-	}
-	
-	
 	public synchronized Object clone(){
 		Survey clone = (Survey)super.clone();
 		clone._reply = new QueueMap();	
-		clone._prmValues = new HashMap();
 		clone.prmVector = new Vector();
 		return clone;
 	}

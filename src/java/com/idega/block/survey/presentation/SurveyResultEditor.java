@@ -26,7 +26,6 @@ import com.idega.core.localisation.data.ICLocale;
 import com.idega.data.IDOException;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
-import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
@@ -63,8 +62,6 @@ public class SurveyResultEditor extends Block {
 	private static String PARAMETER_CREATE_EXCEL = "prmCEx";
 	private SurveyBusiness _sBusiness;
 	private IWResourceBundle _iwrb;
-	private IWBundle _iwb;
-	private IWBundle _iwbSurvey;
 	private Locale _locale;
 	private ICLocale _icLocale;
 	private SurveyEntity _survey;
@@ -94,8 +91,6 @@ public class SurveyResultEditor extends Block {
 		super.initializeInMain(iwc);
 		_sBusiness = (SurveyBusiness) IBOLookup.getServiceInstance(iwc,SurveyBusiness.class);
 		_iwrb = getResourceBundle(iwc);
-		_iwb = iwc.getIWMainApplication().getBundle(IW_CORE_BUNDLE_IDENTIFIER);
-		_iwbSurvey = getBundle(iwc);
 		_locale = iwc.getCurrentLocale();
 		_icLocale = ICLocaleBusiness.getICLocale(_locale);
 		nf.setMinimumFractionDigits(2);
