@@ -79,7 +79,7 @@ public class Survey extends FolderBlock {
 	protected static final String PRM_SELECTION_PREFIX = "su_q_";
 	protected static final String PRM_ANSWER_IN_TEXT_AREA_PREFIX = "su_q_ta_";
 	public final static String PRM_MAINTAIN_SUFFIX = "_mt";
-	
+	public static final String PRM_SURVEY_ID = "survey_id";
 	public final static String PRM_PARTICIPANT_IDENTIFIER = "su_p_id";
 	
 	public static final String PRM_QUESTIONS = "su_questions";
@@ -89,6 +89,7 @@ public class Survey extends FolderBlock {
 	public static final int ACTION_NO_ACTION = 0;
 	public static final int ACTION_PARTICIPATE = 1;
 	public static final int ACTION_SURVEYREPLY = 2;
+	
 	
 	protected int _action = ACTION_NO_ACTION;
 	protected int _lastAction = ACTION_NO_ACTION;
@@ -161,11 +162,16 @@ public class Survey extends FolderBlock {
 	}
 	
 	private void initializeSurvey(IWContext iwc) throws IDOLookupException, RemoteException, FinderException{
-		Collection surveys = this._sBusiness.getSurveyHome().findActiveSurveys(this.getWorkFolder().getEntity(),IWTimestamp.RightNow().getTimestamp());	
-		Iterator surveysIter = surveys.iterator();
-		// TODO change
-		while(surveysIter.hasNext()) {
-			this._currentSurvey = (SurveyEntity)surveysIter.next();
+		String sSid = iwc.getParameter(PRM_SURVEY_ID);
+		if (sSid == null) {
+			Collection surveys = this._sBusiness.getSurveyHome().findActiveSurveys(this.getWorkFolder().getEntity(),IWTimestamp.RightNow().getTimestamp());	
+			Iterator surveysIter = surveys.iterator();
+			// TODO change
+			while(surveysIter.hasNext()) {
+				this._currentSurvey = (SurveyEntity)surveysIter.next();
+			}
+		} else {
+			this._currentSurvey = _sBusiness.getSurveyHome().findByPrimaryKey(new Integer(sSid));
 		}
 	}
 
@@ -334,6 +340,7 @@ public class Survey extends FolderBlock {
 	 */
 	protected PresentationObject getSurveyPresentation(IWContext iwc) {
 		Form myForm = new Form();		
+		myForm.maintainParameter(PRM_SURVEY_ID);
 		
 		if(this._currentSurvey != null){
 			Table surveyTable = new Table();
@@ -425,7 +432,7 @@ public class Survey extends FolderBlock {
 	 */
 	protected PresentationObject getOpenPresentation(IWContext iwc) {
 		Form myForm = new Form();		
-		
+		myForm.maintainParameter(PRM_SURVEY_ID);
 		if(this._currentSurvey != null){
 			Table surveyTable = new Table();
 //			surveyTable.setWidth("100%");
