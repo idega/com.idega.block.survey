@@ -1,8 +1,10 @@
 package com.idega.block.survey.business;
 
 
-public interface SurveyBusinessHome extends com.idega.business.IBOHome
-{
- public SurveyBusiness create() throws javax.ejb.CreateException, java.rmi.RemoteException;
+import javax.ejb.CreateException;
+import com.idega.business.IBOHome;
+import java.rmi.RemoteException;
 
+public interface SurveyBusinessHome extends IBOHome {
+	public SurveyBusiness create() throws CreateException, RemoteException;
 }

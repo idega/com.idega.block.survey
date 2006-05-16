@@ -22,4 +22,6 @@ public interface SurveyEntity extends com.idega.data.IDOEntity
  public void setRemoved(com.idega.user.data.User p0);
  public void setStartTime(java.sql.Timestamp p0);
  public void store();
+	public void setSurveyType(SurveyType type);	
+	public SurveyType getSurveyType();
 }

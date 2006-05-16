@@ -1,29 +1,29 @@
 package com.idega.block.survey.data;
 
 
-public class SurveyAnswerHomeImpl extends com.idega.data.IDOFactory implements SurveyAnswerHome
-{
- protected Class getEntityInterfaceClass(){
-  return SurveyAnswer.class;
- }
+import java.util.Collection;
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+import com.idega.data.IDOEntity;
+import com.idega.data.IDOFactory;
 
+public class SurveyAnswerHomeImpl extends IDOFactory implements SurveyAnswerHome {
+	public Class getEntityInterfaceClass() {
+		return SurveyAnswer.class;
+	}
 
- public SurveyAnswer create() throws javax.ejb.CreateException{
-  return (SurveyAnswer) super.createIDO();
- }
+	public SurveyAnswer create() throws CreateException {
+		return (SurveyAnswer) super.createIDO();
+	}
 
+	public SurveyAnswer findByPrimaryKey(Object pk) throws FinderException {
+		return (SurveyAnswer) super.findByPrimaryKeyIDO(pk);
+	}
 
-public java.util.Collection findQuestionsAnswer(com.idega.block.survey.data.SurveyQuestion p0)throws javax.ejb.FinderException{
-	com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
-	java.util.Collection ids = ((SurveyAnswerBMPBean)entity).ejbFindQuestionsAnswer(p0);
-	this.idoCheckInPooledEntity(entity);
-	return this.getEntityCollectionForPrimaryKeys(ids);
-}
-
- public SurveyAnswer findByPrimaryKey(Object pk) throws javax.ejb.FinderException{
-  return (SurveyAnswer) super.findByPrimaryKeyIDO(pk);
- }
-
-
-
+	public Collection findQuestionsAnswer(SurveyQuestion question) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((SurveyAnswerBMPBean) entity).ejbFindQuestionsAnswer(question);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
 }

@@ -25,6 +25,7 @@ import com.idega.block.survey.business.SurveyBusinessBean;
 import com.idega.block.survey.data.SurveyAnswer;
 import com.idega.block.survey.data.SurveyEntity;
 import com.idega.block.survey.data.SurveyQuestion;
+import com.idega.block.survey.data.SurveyType;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.core.localisation.business.ICLocaleBusiness;
@@ -49,6 +50,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
+import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
@@ -130,6 +132,8 @@ public class SurveyEditor extends FolderBlock {
 	public static final String PRM_ADD_TEXT_INPUT = "su_ati";
 	public static final String PRM_QUESTION_IDS = "su_q_id";
 	public static final String PRM_ANSWER_IDS = "su_a_id";
+	public static final String PRM_CORRECT = "su_a_corr";
+	public static final String PRM_SURVEY_TYPE = "su_ty_id";
 
 	public static final String PRM_DELETE_QUESTION = "su_del_q";
 	public static final String PRM_DELETE_ANSWER = "su_del_a";
@@ -147,6 +151,7 @@ public class SurveyEditor extends FolderBlock {
 	private boolean _maintainDelPRM = true;
 	private Vector _deletedQuestion = new Vector();
 	private Vector _deletedAnswer = new Vector();
+	private Vector prmToMaintain = new Vector();
 
 	private String messageTextStyle;// = "font-weight: bold;";
 	private String messageTextHighlightStyle;// = "font-weight: bold;color:
@@ -188,6 +193,11 @@ public class SurveyEditor extends FolderBlock {
 		Image editImage = this._iwb.getImage("shared/edit.gif");
 		Link adminLink = new Link(editImage);
 		adminLink.addParameter(Survey.PRM_SWITCHTO_MODE, Survey.MODE_SURVEY);
+		Iterator piter = this.prmToMaintain.iterator();
+		while (piter.hasNext()) {
+			Parameter p = ((Parameter) piter.next());
+			adminLink.addParameter(p);
+		}
 
 		return adminLink;
 	}
@@ -197,6 +207,11 @@ public class SurveyEditor extends FolderBlock {
 		add(getModeChangeLink());
 
 		Form myForm = new Form();
+		Iterator piter = this.prmToMaintain.iterator();
+		while (piter.hasNext()) {
+			Parameter p = ((Parameter) piter.next());
+			myForm.add(p);
+		}
 
 		// save to DB
 		if (this._action == ACTION_SAVE) {
@@ -277,8 +292,9 @@ public class SurveyEditor extends FolderBlock {
 
 			table.add(getMessageTextObject(this._iwrb.getLocalizedString("name", "Name"), true), 1, row);
 			table.add(getMessageTextObject(this._iwrb.getLocalizedString("description", "Description"), true), 2, row);
-			table.add(getMessageTextObject(this._iwrb.getLocalizedString("begins", "Begins"), true), 3, row);
-			table.add(getMessageTextObject(this._iwrb.getLocalizedString("ends", "Ends"), true), 4, row);
+			table.add(getMessageTextObject(this._iwrb.getLocalizedString("type", "Type"), true), 3, row);
+			table.add(getMessageTextObject(this._iwrb.getLocalizedString("begins", "Begins"), true), 4, row);
+			table.add(getMessageTextObject(this._iwrb.getLocalizedString("ends", "Ends"), true), 5, row);
 			if (surveys != null && !surveys.isEmpty()) {
 				SurveyEntity survey;
 				Link link;
@@ -295,6 +311,11 @@ public class SurveyEditor extends FolderBlock {
 					link.addParameter(PRM_SURVEY_SELECTED, "true");
 					link.addParameter(PRM_SURVEY_ID, survey.getPrimaryKey().toString());
 					link.addParameter(Survey.PRM_SWITCHTO_MODE, Survey.MODE_EDIT);
+					Iterator piter = this.prmToMaintain.iterator();
+					while (piter.hasNext()) {
+						Parameter p = ((Parameter) piter.next());
+						link.addParameter(p);
+					}
 
 					try {
 						from = new IWTimestamp(survey.getStartTime());
@@ -311,18 +332,23 @@ public class SurveyEditor extends FolderBlock {
 
 					table.add(link, 1, row);
 					table.add(getMessageTextObject(survey.getDescription(), false), 2, row);
+					
+					SurveyType sType = business.getSurveyType(survey);
+					if (sType != null) {
+						table.add(_iwrb.getLocalizedString(sType.getLocalizationKey(), sType.getName()), 3, row);
+					}
 					if (from != null) {
-						table.add(from.getLocaleDateAndTime(this._iLocale), 3, row);
+						table.add(from.getLocaleDateAndTime(this._iLocale), 4, row);
 					}
 					if (to != null) {
-						table.add(to.getLocaleDateAndTime(this._iLocale), 4, row);
+						table.add(to.getLocaleDateAndTime(this._iLocale), 5, row);
 					}
 
 					del = new Link(delIm);
 					// del.addParameter(PRM_SURVEY_SELECTED, "true");
 					del.addParameter(Survey.PRM_SWITCHTO_MODE, Survey.MODE_EDIT);
 					del.addParameter(PARAMETER_DELETE, survey.getPrimaryKey().toString());
-					table.add(del, 5, row);
+					table.add(del, 6, row);
 
 					// addAttribute(getColumnNameName(), "Name", true, true,
 					// String.class);
@@ -366,6 +392,7 @@ public class SurveyEditor extends FolderBlock {
 		String sDesc = iwc.getParameter(PRM_SURVEY_DESCRIPTION);
 		String sFrom = iwc.getParameter(PRM_SURVEY_START_TIME);
 		String sTo = iwc.getParameter(PRM_SURVEY_END_DATE);
+		String sType = iwc.getParameter(PRM_SURVEY_TYPE);
 		IWTimestamp fromStamp = IWTimestamp.RightNow();
 		IWTimestamp toStamp = null;
 		try {
@@ -406,10 +433,18 @@ public class SurveyEditor extends FolderBlock {
 			else {
 				survey.setEndTime(null);
 			}
+			if (sType != null) {
+				try {
+					survey.setSurveyType(business.getSurveyTypeHome().findByPrimaryKey(sType));
+				} catch (FinderException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			survey.store();
 		}
 		else {
-			survey = business.createSurvey(this.getWorkFolder(), sName, sDesc, fromStamp, toStamp);
+			survey = business.createSurvey(this.getWorkFolder(), sName, sDesc, fromStamp, toStamp, sType);
 		}
 
 		String[] questions = (String[]) this._prmValues.get(PRM_QUESTION);
@@ -442,10 +477,20 @@ public class SurveyEditor extends FolderBlock {
 					String[] answerIDs = (String[]) this._prmValues.get(PRM_ANSWER_IDS + (i + 1));
 					int numberOfAnswerIDs = (answerIDs == null) ? 0 : answerIDs.length;
 					if (answers != null) {
+						String corr= iwc.getParameter(PRM_CORRECT + (i+1));
+						int iCorr = -1;
+						if (corr != null) {
+							try {
+								iCorr = Integer.parseInt(corr);
+							} catch (Exception e) {}
+						}
 						for (int j = 0; j < answers.length; j++) {
 							if (answers[j] != null && !"".equals(answers[j])) {
+								boolean isCorrect = (j == iCorr);
 								if (numberOfAnswerIDs <= j) {
 									SurveyAnswer ans = business.createSurveyAnswer(question, (type == ANSWERTYPE_TEXTAREA) ? "" : answers[j], locale);
+									ans.setCorrectAnswer(isCorrect);
+									ans.store();
 									this.prmVector.add(new Parameter(PRM_ANSWER_IDS + (i + 1) + PRM_MAINTAIN_SUFFIX, ans.toString()));
 								}
 								else {
@@ -457,6 +502,8 @@ public class SurveyEditor extends FolderBlock {
 									// business.removeAnswerFromQuestion(question,ans,iwc.getCurrentUser());
 									// } else {
 									business.updateSurveyAnswer(ans, (type == ANSWERTYPE_TEXTAREA) ? "" : answers[j], locale);
+									ans.setCorrectAnswer(isCorrect);
+									ans.store();
 									// }
 								}
 							}
@@ -496,6 +543,7 @@ public class SurveyEditor extends FolderBlock {
 		String sDesc = iwc.getParameter(PRM_SURVEY_DESCRIPTION);
 		String sFrom = iwc.getParameter(PRM_SURVEY_START_TIME);
 		String sTo = iwc.getParameter(PRM_SURVEY_END_DATE);
+		String sType = iwc.getParameter(PRM_SURVEY_TYPE);
 		IWTimestamp fromStamp = IWTimestamp.RightNow();
 		IWTimestamp toStamp = null;
 		try {
@@ -518,7 +566,7 @@ public class SurveyEditor extends FolderBlock {
 		if (sDesc == null) {
 			sDesc = "";
 		}
-		SurveyEntity survey = business.createSurvey(this.getWorkFolder(), sName, sDesc, fromStamp, toStamp);
+		SurveyEntity survey = business.createSurvey(this.getWorkFolder(), sName, sDesc, fromStamp, toStamp, sType);
 
 		String[] questions = (String[]) this._prmValues.get(PRM_QUESTION);
 		String[] answerType = (String[]) this._prmValues.get(PRM_ANSWERTYPE);
@@ -708,6 +756,7 @@ public class SurveyEditor extends FolderBlock {
 					processParameterValues(iwc, PRM_ANSWER + i, true);
 					processParameterValues(iwc, PRM_ANSWER_IDS + i, true);
 					processParameterValues(iwc, PRM_ADD_TEXT_INPUT + i, true);
+					processParameterValues(iwc, PRM_CORRECT + i, true);
 				}
 			}
 			// answertypes
@@ -784,6 +833,7 @@ public class SurveyEditor extends FolderBlock {
 
 			Vector prmAnswers = new Vector();
 			Vector prmAnswerIDs = new Vector();
+			Vector prmCorrects = new Vector();
 			Collection answers = business.getAnswerHome().findQuestionsAnswer(question);
 			for (Iterator aIter = answers.iterator(); aIter.hasNext();) {
 				SurveyAnswer answer = (SurveyAnswer) aIter.next();
@@ -795,6 +845,10 @@ public class SurveyEditor extends FolderBlock {
 				String sAnswerID = answer.getPrimaryKey().toString();
 				prmAnswerIDs.add(sAnswerID);
 				this.prmVector.add(new Parameter(PRM_ANSWER_IDS + questionNumber + PRM_MAINTAIN_SUFFIX, sAnswerID));
+				
+				Boolean bCurr = new Boolean(answer.getIsCorrectAnswer());
+				prmCorrects.add(bCurr);
+				this.prmVector.add(new Parameter(PRM_CORRECT + questionNumber + PRM_MAINTAIN_SUFFIX, bCurr.toString()));
 			}
 			String sNumberOfAnswers = String.valueOf(answers.size());
 			prmNumberOfAnswers.add(sNumberOfAnswers);
@@ -802,6 +856,7 @@ public class SurveyEditor extends FolderBlock {
 
 			this._prmValues.put(PRM_ANSWER + questionNumber, prmAnswers.toArray(new String[0]));
 			this._prmValues.put(PRM_ANSWER_IDS + questionNumber, prmAnswerIDs.toArray(new String[0]));
+			this._prmValues.put(PRM_CORRECT + questionNumber, prmCorrects.toArray(new Boolean[0]));
 
 		}
 
@@ -976,7 +1031,7 @@ public class SurveyEditor extends FolderBlock {
 				selectedAnsType = selectedAnsTypes[i - 1];
 				numberOfAns = numberOfAnswers[i - 1];
 			}
-			stateOne.add(getQuestionFieldset(i, question, selectedAnsType, numberOfAns, (questionIDs != null && questionIDs.length >= i)), 1, ++rowIndex);
+			stateOne.add(getQuestionFieldset(iwc, i, question, selectedAnsType, numberOfAns, (questionIDs != null && questionIDs.length >= i)), 1, ++rowIndex);
 
 		}
 
@@ -1100,7 +1155,17 @@ public class SurveyEditor extends FolderBlock {
 			setStyle(to);
 			table.add(getLabel(this._iwrb.getLocalizedString("ends", "Ends")), 1, row);
 			table.add(to, 2, row++);
-
+			
+			DropdownMenu menu = business.getSurveyTypeDropdownMenu(_iwrb, PRM_SURVEY_TYPE);
+			if (survey != null) {
+				menu.setSelectedElement(business.getSurveyType(survey).getPrimaryKey().toString());
+			}
+			menu.keepStatusOnAction(true);
+			menu.setToSubmit();
+			setStyle(menu);
+			table.add(getLabel(this._iwrb.getLocalizedString("type", "Type")), 1, row);
+			table.add(menu, 2, row++);
+			
 			return fs;
 		}
 		catch (Exception e) {
@@ -1178,7 +1243,7 @@ public class SurveyEditor extends FolderBlock {
 		return t;
 	}
 
-	private PresentationObject getQuestionFieldset(int no, String question, String selectedAnsType, String numberOfAns, boolean removable) {
+	private PresentationObject getQuestionFieldset(IWContext iwc, int no, String question, String selectedAnsType, String numberOfAns, boolean removable) {
 		FieldSet fs = new FieldSet(this._iwrb.getLocalizedString("Question", "Question") + " " + no);
 		Table qt = new Table();
 		qt.setVerticalAlignment(1, 1, Table.VERTICAL_ALIGN_TOP);
@@ -1191,7 +1256,7 @@ public class SurveyEditor extends FolderBlock {
 
 		qt.add(getQuestionTextArea(PRM_QUESTION, question), 2, 1);
 		qt.add(getLabel(this._iwrb.getLocalizedString("Answer_type", "Answer type")), 1, 2);
-		qt.add(getAnswerTypeDropdownMenu(PRM_ANSWERTYPE, selectedAnsType), 2, 2);
+		qt.add(getAnswerTypeDropdownMenu(iwc, PRM_ANSWERTYPE, selectedAnsType), 2, 2);
 		qt.add(getLabel(this._iwrb.getLocalizedString("Number_of_answers", "Number of answers")), 1, 3);
 		qt.add(getNumberOfAnswersDropdownMenu(PRM_NUMBER_OF_ANSWERS, numberOfAns), 2, 3);
 		if (removable) {
@@ -1215,6 +1280,7 @@ public class SurveyEditor extends FolderBlock {
 		qt.add(getLabel(this._iwrb.getLocalizedString("Question", "Question")), 1, 1);
 		PresentationObject question = getQuestionTextArea(PRM_QUESTION, questionText);
 		qt.add(question, 2, 1);
+		qt.mergeCells(2, 1, 3, 1);
 
 		switch (answerType) {
 			case ANSWERTYPE_SINGLE_CHOICE:
@@ -1224,7 +1290,12 @@ public class SurveyEditor extends FolderBlock {
 				qt.add(getLabel(this._iwrb.getLocalizedString("Answer_type", "Answer type")), 1, 2);
 				qt.add(getListAnswerTypeDropdownMenu(PRM_ANSWERTYPE, answerType), 2, 2);
 
+				if (answerType == ANSWERTYPE_SINGLE_CHOICE) {
+					qt.add(getLabel(this._iwrb.getLocalizedString("correct", "Correct")), 3, 2);
+				}
+				
 				String[] answers = (String[]) this._prmValues.get(PRM_ANSWER + no);
+				String[] corrects = (String[]) this._prmValues.get(PRM_CORRECT + no);
 				// String[] useTextInput =
 				// (String[])_prmValues.get(PRM_ADD_TEXT_INPUT+no);
 				for (int i = 0; i < numberOfAnswers; i++) {
@@ -1239,6 +1310,16 @@ public class SurveyEditor extends FolderBlock {
 
 					qt.add(getLabel(String.valueOf(i + 1)), 2, i + 3);
 					qt.add(getAnswerTextInput(PRM_ANSWER + no, ans), 2, i + 3);
+					if (answerType == ANSWERTYPE_SINGLE_CHOICE) {
+						RadioButton r = new RadioButton(PRM_CORRECT + no);
+						r.setValue(Integer.toString(i));
+						try {
+							r.setSelected(Boolean.valueOf(corrects[i]).booleanValue());
+						} catch (Exception e) {
+							System.out.println("[SurveyEditor] correct answer not found");
+						}
+						qt.add(r, 3, i+3);
+					}
 					// qt.add(Text.NON_BREAKING_SPACE);
 					// qt.add(getAddTextInputCheckBox(PRM_ADD_TEXT_INPUT+no,check),2,i+3);
 				}
@@ -1315,12 +1396,46 @@ public class SurveyEditor extends FolderBlock {
 	 * @param string
 	 * @return
 	 */
-	private DropdownMenu getAnswerTypeDropdownMenu(String name, String value) {
+	private DropdownMenu getAnswerTypeDropdownMenu(IWContext iwc, String name, String value) {
 		DropdownMenu d = new DropdownMenu(name);
 		setStyle(d);
-		d.addMenuElement(ANSWERTYPE_SINGLE_CHOICE, this._iwrb.getLocalizedString("Radio_group", "Radio group (single-choice)"));
-		d.addMenuElement(ANSWERTYPE_MULTI_CHOICE, this._iwrb.getLocalizedString("Checkboxes", "Checkboxes  (multi-choice)"));
-		d.addMenuElement(ANSWERTYPE_TEXTAREA, this._iwrb.getLocalizedString("Textarea", "Textarea"));
+
+		char[] types = null;
+		String type = iwc.getParameter(PRM_SURVEY_TYPE);
+		try {
+			if (type != null) {
+				SurveyBusiness business = (SurveyBusiness) IBOLookup.getServiceInstance(iwc, SurveyBusiness.class);
+				types = business.getSurveyTypeHome().findByPrimaryKey(new Integer(type)).getAnswerTypes();
+			}
+			else if (this._surveyID != null) {
+				SurveyBusiness business = (SurveyBusiness) IBOLookup.getServiceInstance(iwc, SurveyBusiness.class);
+				SurveyEntity survey = business.getSurveyHome().findByPrimaryKey(this._surveyID);
+				types = business.getSurveyType(survey).getAnswerTypes();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (types == null) {
+			d.addMenuElement(ANSWERTYPE_SINGLE_CHOICE, this._iwrb.getLocalizedString("Radio_group", "Radio group (single-choice)"));
+			d.addMenuElement(ANSWERTYPE_MULTI_CHOICE, this._iwrb.getLocalizedString("Checkboxes", "Checkboxes  (multi-choice)"));
+			d.addMenuElement(ANSWERTYPE_TEXTAREA, this._iwrb.getLocalizedString("Textarea", "Textarea"));
+		} else {
+			for (int i = 0; i < types.length; i++) {
+				switch (types[i]) {
+					case ANSWERTYPE_SINGLE_CHOICE :
+						d.addMenuElement(ANSWERTYPE_SINGLE_CHOICE, this._iwrb.getLocalizedString("Radio_group", "Radio group (single-choice)"));
+						break;
+					case ANSWERTYPE_MULTI_CHOICE :
+						d.addMenuElement(ANSWERTYPE_MULTI_CHOICE, this._iwrb.getLocalizedString("Checkboxes", "Checkboxes  (multi-choice)"));
+						break;
+					case ANSWERTYPE_TEXTAREA :
+						d.addMenuElement(ANSWERTYPE_TEXTAREA, this._iwrb.getLocalizedString("Textarea", "Textarea"));
+						break;
+				}
+			}
+		}
+
 		if (value != null) {
 			d.setSelectedElement(value);
 		}
@@ -1428,6 +1543,10 @@ public class SurveyEditor extends FolderBlock {
 
 	public void setMessageTextHighlightStyle(String style) {
 		this.messageTextHighlightStyle = style;
+	}
+	
+	public void maintainParameter(String name, String value) {
+		this.prmToMaintain.add(new Parameter(name, value));
 	}
 
 }

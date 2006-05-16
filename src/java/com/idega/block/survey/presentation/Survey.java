@@ -69,15 +69,15 @@ public class Survey extends FolderBlock {
 	protected IWResourceBundle _iwrb;
 	protected IWBundle _iwb;
 	protected IWBundle _iwbSurvey;
-	private Locale _iLocaleID;
+	protected Locale _iLocaleID;
 	
 	public final static String STYLE = "font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;";
 	public final static String STYLE_2 = "font-family:arial; font-size:8pt; color:#000000; text-align: justify;";
 	public final static String STYLE_BUTTON = "font-family:arial; font-size:8pt; color:#000000; text-align: center; border: 1 solid #000000;";
 
 	
-	private static final String PRM_SELECTION_PREFIX = "su_q_";
-	private static final String PRM_ANSWER_IN_TEXT_AREA_PREFIX = "su_q_ta_";
+	protected static final String PRM_SELECTION_PREFIX = "su_q_";
+	protected static final String PRM_ANSWER_IN_TEXT_AREA_PREFIX = "su_q_ta_";
 	public final static String PRM_MAINTAIN_SUFFIX = "_mt";
 	
 	public final static String PRM_PARTICIPANT_IDENTIFIER = "su_p_id";
@@ -90,14 +90,14 @@ public class Survey extends FolderBlock {
 	public static final int ACTION_PARTICIPATE = 1;
 	public static final int ACTION_SURVEYREPLY = 2;
 	
-	private int _action = ACTION_NO_ACTION;
-	private int _lastAction = ACTION_NO_ACTION;
+	protected int _action = ACTION_NO_ACTION;
+	protected int _lastAction = ACTION_NO_ACTION;
 	
-	private Vector prmVector = new Vector();
-	private QueueMap _reply = new QueueMap();
+	protected Vector prmVector = new Vector();
+	protected QueueMap _reply = new QueueMap();
 	
-	private SurveyBusiness _sBusiness = null;
-	private SurveyEntity _currentSurvey = null;
+	protected SurveyBusiness _sBusiness = null;
+	protected SurveyEntity _currentSurvey = null;
 	
 	private String questionTextStyle;// = "font-weight: bold;";
 	private String answerTextStyle;
@@ -120,7 +120,7 @@ public class Survey extends FolderBlock {
 	public final static String MODE_EDIT = "edit";
 	public static final String MODE_SURVEY = "survey";
 	public static final String MODE_RESULTS = "results";
-	private String _mode = MODE_SURVEY;
+	protected String _mode = MODE_SURVEY;
 	public final static String PRM_MODE = "su_mode";
 	public final static String PRM_SWITCHTO_MODE = "su_swto_mode";
 	
@@ -129,9 +129,9 @@ public class Survey extends FolderBlock {
 	private int textAreaColumns = 50;
 	private int textAreaRows = 8;
 	
-	private boolean showHelp = true;
-	private boolean showIdentificationState = true;
-	private String _participant = null;
+	protected boolean showHelp = true;
+	protected boolean showIdentificationState = true;
+	protected String _participant = null;
 
 
 	/**
@@ -302,7 +302,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @param iwc
 	 */
-	private void storeReply(IWContext iwc) throws FinderException, IDOLookupException, RemoteException, CreateException {
+	protected void storeReply(IWContext iwc) throws FinderException, IDOLookupException, RemoteException, CreateException {
 		
 		Set questions = this._reply.keySet();
 		if(questions != null){
@@ -332,7 +332,7 @@ public class Survey extends FolderBlock {
 	 * @param iwc
 	 * @return
 	 */
-	private PresentationObject getSurveyPresentation(IWContext iwc) {
+	protected PresentationObject getSurveyPresentation(IWContext iwc) {
 		Form myForm = new Form();		
 		
 		if(this._currentSurvey != null){
@@ -423,7 +423,7 @@ public class Survey extends FolderBlock {
 	 * @param iwc
 	 * @return
 	 */
-	private PresentationObject getOpenPresentation(IWContext iwc) {
+	protected PresentationObject getOpenPresentation(IWContext iwc) {
 		Form myForm = new Form();		
 		
 		if(this._currentSurvey != null){
@@ -600,7 +600,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	private PresentationObject getCheckBox(Object name, Object value) {
+	protected PresentationObject getCheckBox(Object name, Object value) {
 		CheckBox box = new CheckBox(PRM_SELECTION_PREFIX+name.toString(),value.toString());
 		List answers = (List)this._reply.get(name);
 		if(answers != null){
@@ -617,7 +617,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	private PresentationObject getRadioButton(Object name, Object value) {
+	protected PresentationObject getRadioButton(Object name, Object value) {
 		RadioButton r = new RadioButton(PRM_SELECTION_PREFIX+name.toString(),value.toString());
 		List answers = (List)this._reply.get(name);
 		if(answers != null){
@@ -635,7 +635,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	private PresentationObject getAnswerTextArea(Object name) {
+	protected PresentationObject getAnswerTextArea(Object name) {
 		TextArea aTA = new TextArea(PRM_ANSWER_IN_TEXT_AREA_PREFIX+name);
 		//aTA.setStyleAttribute(style_form_element);
 		
@@ -710,7 +710,7 @@ public class Survey extends FolderBlock {
 		return text;
 	}
 
-	private Table getAdminPart() {
+	protected Table getAdminPart() {
 		Table table = new Table();
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -829,7 +829,7 @@ public class Survey extends FolderBlock {
 		this.messageTextHighlightStyle = style;
 	}
 	
-	private PresentationObject getMessageTextObject(String message, boolean highlight) {
+	protected PresentationObject getMessageTextObject(String message, boolean highlight) {
 		Text text = new Text(message);
 		if(!highlight){
 			if(this.messageTextStyle != null){

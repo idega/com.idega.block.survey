@@ -1,10 +1,18 @@
 package com.idega.block.survey.data;
 
 
-public interface SurveyAnswerHome extends com.idega.data.IDOHome
-{
- public SurveyAnswer create() throws javax.ejb.CreateException;
- public SurveyAnswer findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
- public java.util.Collection findQuestionsAnswer(com.idega.block.survey.data.SurveyQuestion p0)throws javax.ejb.FinderException;
+import java.util.Collection;
+import javax.ejb.CreateException;
+import com.idega.data.IDOHome;
+import javax.ejb.FinderException;
 
+public interface SurveyAnswerHome extends IDOHome {
+	public SurveyAnswer create() throws CreateException;
+
+	public SurveyAnswer findByPrimaryKey(Object pk) throws FinderException;
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#ejbFindQuestionsAnswer
+	 */
+	public Collection findQuestionsAnswer(SurveyQuestion question) throws FinderException;
 }
