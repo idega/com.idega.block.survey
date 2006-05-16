@@ -25,6 +25,7 @@ import com.idega.block.survey.data.SurveyEntity;
 import com.idega.block.survey.data.SurveyQuestion;
 import com.idega.block.survey.data.SurveyStatus;
 import com.idega.business.IBOLookup;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.localisation.data.ICLocale;
 import com.idega.data.IDOLookupException;
@@ -89,7 +90,7 @@ public class Survey extends FolderBlock {
 	public static final int ACTION_NO_ACTION = 0;
 	public static final int ACTION_PARTICIPATE = 1;
 	public static final int ACTION_SURVEYREPLY = 2;
-	
+	protected ICPage resultPage = null;
 	
 	protected int _action = ACTION_NO_ACTION;
 	protected int _lastAction = ACTION_NO_ACTION;
@@ -339,8 +340,13 @@ public class Survey extends FolderBlock {
 	 * @return
 	 */
 	protected PresentationObject getSurveyPresentation(IWContext iwc) {
-		Form myForm = new Form();		
-		myForm.maintainParameter(PRM_SURVEY_ID);
+		Form myForm = new Form();
+		if (resultPage != null) {
+			myForm.setPageToSubmitTo(resultPage);
+			myForm.addParameter(PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
+		} else {
+			myForm.maintainParameter(PRM_SURVEY_ID);
+		}
 		
 		if(this._currentSurvey != null){
 			Table surveyTable = new Table();
@@ -856,6 +862,10 @@ public class Survey extends FolderBlock {
 	 */
 	public void setAnswerTextStyle(String style) {
 		this.answerTextStyle = style;
+	}
+
+	public void setResultPage(ICPage resultPage) {
+		this.resultPage = resultPage;
 	}
 
 }

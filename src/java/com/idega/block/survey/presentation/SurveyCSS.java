@@ -196,7 +196,12 @@ public class SurveyCSS extends Survey {
 
 	protected PresentationObject getSurveyPresentation(IWContext iwc) {
 		Form myForm = new Form();		
-		myForm.maintainParameter(PRM_SURVEY_ID);
+		if (resultPage != null) {
+			myForm.setPageToSubmitTo(resultPage);
+			myForm.addParameter(PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
+		} else {
+			myForm.maintainParameter(PRM_SURVEY_ID);
+		}
 		if (id != null) {
 			myForm.setId(id);
 		}
