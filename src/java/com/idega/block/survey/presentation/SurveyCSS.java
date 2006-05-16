@@ -326,12 +326,12 @@ public class SurveyCSS extends Survey {
 							boolean correct = answer.getIsCorrectAnswer();
 							if (selected > 0 && selected == ((Integer) answer.getPrimaryKey()).intValue()) {
 								if (correct) {
-									l.setStyleClass("selected_correct");
+									li.setStyleClass("selected_correct");
 								} else {
-									l.setStyleClass("selected_incorrect");
+									li.setStyleClass("selected_incorrect");
 								}
 							} else 	if (correct) {
-								l.setStyleClass("correct");
+								li.setStyleClass("correct");
 							}
 						}
 						l.add(answer.getAnswer(locale));
