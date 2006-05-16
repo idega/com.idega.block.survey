@@ -19,19 +19,28 @@
 	padding : 2px 0;
 }
 
-
 .survey .correct {
     color : GREEN;
+	background: url(/idegaweb/bundles/com.idega.block.survey.bundle/resources/style/img/opts_16.gif) 0px 0px no-repeat;
+	margin-left : -20px;
+	padding-left : 20px;
 }
 
 .survey .selected_incorrect {
     color : RED;
 	text-decoration: line-through;
+	background: url(/idegaweb/bundles/com.idega.block.survey.bundle/resources/style/img/del_16.gif) 0px 0px no-repeat;
+	margin-left : -20px;
+	padding-left : 20px;
 }
 
 .survey .selected_correct {
     color : BLUE;
+	background: url(/idegaweb/bundles/com.idega.block.survey.bundle/resources/style/img/opts_16.gif) 0px 0px no-repeat;
+	margin-left : -20px;
+	padding-left : 20px;
 }
+
 
 .survey .legend {
 	width : 80px;
@@ -42,5 +51,6 @@
 }
 
 .survey .legend SPAN {
+	background : none;
 	display : block;
 }
