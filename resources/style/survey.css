@@ -1,0 +1,46 @@
+.survey H1 {
+	font-size : 20px;
+}
+.survey H2 {
+	font-size : 16px;
+	margin : 0;
+}
+.survey SPAN {
+	font-size : 12px;
+}
+
+.survey ul {
+	list-style-type: none;
+	margin : 5px;
+	padding-left : 20px;
+}
+
+.survey ul li {
+	padding : 2px 0;
+}
+
+
+.survey .correct {
+    color : GREEN;
+}
+
+.survey .selected_incorrect {
+    color : RED;
+	text-decoration: line-through;
+}
+
+.survey .selected_correct {
+    color : BLUE;
+}
+
+.survey .legend {
+	width : 80px;
+	padding : 5px;
+	background-color : #ffffcc;
+	border : 1px solid black;
+
+}
+
+.survey .legend SPAN {
+	display : block;
+}
