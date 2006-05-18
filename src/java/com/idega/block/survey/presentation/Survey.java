@@ -172,7 +172,7 @@ public class Survey extends FolderBlock {
 				this._currentSurvey = (SurveyEntity)surveysIter.next();
 			}
 		} else {
-			this._currentSurvey = _sBusiness.getSurveyHome().findByPrimaryKey(new Integer(sSid));
+			this._currentSurvey = this._sBusiness.getSurveyHome().findByPrimaryKey(new Integer(sSid));
 		}
 	}
 
@@ -341,8 +341,8 @@ public class Survey extends FolderBlock {
 	 */
 	protected PresentationObject getSurveyPresentation(IWContext iwc) {
 		Form myForm = new Form();
-		if (resultPage != null) {
-			myForm.setPageToSubmitTo(resultPage);
+		if (this.resultPage != null) {
+			myForm.setPageToSubmitTo(this.resultPage);
 			myForm.addParameter(PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
 		} else {
 			myForm.maintainParameter(PRM_SURVEY_ID);

@@ -335,7 +335,7 @@ public class SurveyEditor extends FolderBlock {
 					
 					SurveyType sType = business.getSurveyType(survey);
 					if (sType != null) {
-						table.add(_iwrb.getLocalizedString(sType.getLocalizationKey(), sType.getName()), 3, row);
+						table.add(this._iwrb.getLocalizedString(sType.getLocalizationKey(), sType.getName()), 3, row);
 					}
 					if (from != null) {
 						table.add(from.getLocaleDateAndTime(this._iLocale), 4, row);
@@ -1156,7 +1156,7 @@ public class SurveyEditor extends FolderBlock {
 			table.add(getLabel(this._iwrb.getLocalizedString("ends", "Ends")), 1, row);
 			table.add(to, 2, row++);
 			
-			DropdownMenu menu = business.getSurveyTypeDropdownMenu(_iwrb, PRM_SURVEY_TYPE);
+			DropdownMenu menu = business.getSurveyTypeDropdownMenu(this._iwrb, PRM_SURVEY_TYPE);
 			if (survey != null) {
 				menu.setSelectedElement(business.getSurveyType(survey).getPrimaryKey().toString());
 			}

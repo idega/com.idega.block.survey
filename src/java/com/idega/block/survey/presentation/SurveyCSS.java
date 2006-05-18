@@ -96,7 +96,7 @@ public class SurveyCSS extends Survey {
 			} else {
 				if(this._action == ACTION_SURVEYREPLY && this._surveyAnswerDifference.isEmpty()){
 					storeReply(iwc);
-					if (_currentSurvey != null && _currentSurvey.getSurveyType().getShowResults()) {
+					if (this._currentSurvey != null && this._currentSurvey.getSurveyType().getShowResults()) {
 						add(getSurveyResults(iwc));
 					} else {
 						add(Text.BREAK);
@@ -128,10 +128,10 @@ public class SurveyCSS extends Survey {
 		
 		if(this._currentSurvey != null){
 			
-			Heading1 h1 = new Heading1(_currentSurvey.getName());
+			Heading1 h1 = new Heading1(this._currentSurvey.getName());
 			l.add(h1);
 			
-			ICLocale locale = ICLocaleBusiness.getICLocale(_iLocaleID);
+			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
 			try {
 				Collection questions = this._currentSurvey.getSurveyQuestions();
 				int questionNumber = 1; 
@@ -174,13 +174,13 @@ public class SurveyCSS extends Survey {
 			
 			Layer corr = new Layer(Layer.SPAN);
 			corr.setStyleClass("selected_correct");
-			corr.add(_iwrb.getLocalizedString("correct_answer", "Correct answer"));
+			corr.add(this._iwrb.getLocalizedString("correct_answer", "Correct answer"));
 			Layer inc = new Layer(Layer.SPAN);
 			inc.setStyleClass("selected_incorrect");
-			inc.add(_iwrb.getLocalizedString("incorrect_answer", "Incorrect answer"));
+			inc.add(this._iwrb.getLocalizedString("incorrect_answer", "Incorrect answer"));
 			Layer right = new Layer(Layer.SPAN);
 			right.setStyleClass("correct");
-			right.add(_iwrb.getLocalizedString("correct_option", "Correct option"));
+			right.add(this._iwrb.getLocalizedString("correct_option", "Correct option"));
 			
 			legend.add(corr);
 			legend.add(inc);
@@ -196,22 +196,22 @@ public class SurveyCSS extends Survey {
 
 	protected PresentationObject getSurveyPresentation(IWContext iwc) {
 		Form myForm = new Form();		
-		if (resultPage != null) {
-			myForm.setPageToSubmitTo(resultPage);
+		if (this.resultPage != null) {
+			myForm.setPageToSubmitTo(this.resultPage);
 			myForm.addParameter(PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
 		} else {
 			myForm.maintainParameter(PRM_SURVEY_ID);
 		}
-		if (id != null) {
-			myForm.setId(id);
+		if (this.id != null) {
+			myForm.setId(this.id);
 		}
 		myForm.setStyleClass("survey");
 		if(this._currentSurvey != null){
 			
-			Heading1 h1 = new Heading1(_currentSurvey.getName());
+			Heading1 h1 = new Heading1(this._currentSurvey.getName());
 			myForm.add(h1);
 			
-			ICLocale locale = ICLocaleBusiness.getICLocale(_iLocaleID);
+			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
 			try {
 				Collection questions = this._currentSurvey.getSurveyQuestions();
 				int questionNumber = 1; 
@@ -247,7 +247,7 @@ public class SurveyCSS extends Survey {
 				Layer submit = new Layer(Layer.DIV);
 				submit.setStyleClass("survey_buttons");
 				Layer sL = new Layer(Layer.SPAN);
-				sL.add(_iwrb.getLocalizedString("submit","Submit"));
+				sL.add(this._iwrb.getLocalizedString("submit","Submit"));
 				Link submitLink = new Link(sL);
 				submitLink.setFormToSubmit(myForm, false);
 				myForm.addParameter(PRM_ACTION,String.valueOf(ACTION_SURVEYREPLY));
@@ -262,7 +262,7 @@ public class SurveyCSS extends Survey {
 		} else {
 			Layer l = new Layer();
 			l.setStyleClass("survey_message");
-			l.add(_iwrb.getLocalizedString("no_survey_defined","No survey defined"));
+			l.add(this._iwrb.getLocalizedString("no_survey_defined","No survey defined"));
 			myForm.add(l);
 		}
 		
