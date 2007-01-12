@@ -31,7 +31,6 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 	public static final String COLUMNNAME_TEXT_INPUT = "TEXT_INPUT";
 	public static final String COLUMNNAME_QUESTION_ID = "SU_SURVEY_QUESTION_ID";
 	public static final String COLUMNNAME_CREATION_LOCALE = "CREATION_LOCALE";	
-	private static final String COLUMN_CORRECT = "CORRECT";
 	
 	private final static String DELETED_COLUMN = "DELETED";
 	private final static String DELETED_BY_COLUMN = "DELETED_BY";
@@ -54,7 +53,7 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 		addManyToOneRelationship(COLUMNNAME_QUESTION_ID,SurveyQuestion.class);
 		setNullable(COLUMNNAME_QUESTION_ID, false);
 		addAttribute(COLUMNNAME_TEXT_INPUT,"Text input",true,true,Boolean.class);
-		addAttribute(COLUMN_CORRECT, "repps", Boolean.class);
+
 		addManyToOneRelationship(COLUMNNAME_CREATION_LOCALE, "Locale id", ICLocale.class);
 
 		addAttribute(DELETED_COLUMN, "Deleted", true, true, String.class, 1);
@@ -179,12 +178,6 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 		setColumn(DELETED_WHEN_COLUMN, when);
 	}
 
-	public void setCorrectAnswer(boolean isCorrect) {
-		setColumn(COLUMN_CORRECT, isCorrect);
-	}
-	
-	public boolean getIsCorrectAnswer() {
-		return getBooleanColumnValue(COLUMN_CORRECT, false);
-	}
+
 
 }

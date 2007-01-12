@@ -16,8 +16,8 @@ import com.idega.data.IDOAddRelationshipException;
 import com.idega.data.IDOQuery;
 import com.idega.data.IDORelationshipException;
 import com.idega.data.IDORemoveRelationshipException;
-import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.user.data.User;
 
 
 /**
@@ -40,7 +40,7 @@ public class SurveyEntityBMPBean extends com.idega.data.GenericEntity implements
 	private final static String DELETED_WHEN_COLUMN = "DELETED_WHEN";
 	public final static String DELETED = "Y";
 	public final static String NOT_DELETED = "N";
-	private static final String SURVEY_TYPE = "SU_SURVEY_TYPE_ID";
+
 
 	public SurveyEntityBMPBean() {
 		super();
@@ -66,7 +66,6 @@ public class SurveyEntityBMPBean extends com.idega.data.GenericEntity implements
 		this.addManyToOneRelationship(getColumnNameFolderID(), "Info Folder", ICInformationFolder.class);
 		this.addManyToOneRelationship(getColumnNameCatID(), "Category", ICInformationCategory.class);
 
-		this.addManyToOneRelationship(SURVEY_TYPE, SurveyType.class);
 		
 		addManyToManyRelationShip(SurveyQuestion.class, "SU_SURVEY_SURVEY_QUESTION");
 	}
@@ -266,14 +265,6 @@ public class SurveyEntityBMPBean extends com.idega.data.GenericEntity implements
 	 */
 	private void setDeletedWhen(Timestamp when) {
 		setColumn(DELETED_WHEN_COLUMN, when);
-	}
-	
-	public void setSurveyType(SurveyType type) {
-		setColumn(SURVEY_TYPE, type);
-	}
-	
-	public SurveyType getSurveyType() {
-		return (SurveyType) getColumnValue(SURVEY_TYPE);
 	}
 
 }

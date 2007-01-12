@@ -8,6 +8,7 @@ package com.idega.block.survey.presentation;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -25,7 +26,6 @@ import com.idega.block.survey.data.SurveyEntity;
 import com.idega.block.survey.data.SurveyQuestion;
 import com.idega.block.survey.data.SurveyStatus;
 import com.idega.business.IBOLookup;
-import com.idega.core.builder.data.ICPage;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.localisation.data.ICLocale;
 import com.idega.data.IDOLookupException;
@@ -70,17 +70,18 @@ public class Survey extends FolderBlock {
 	protected IWResourceBundle _iwrb;
 	protected IWBundle _iwb;
 	protected IWBundle _iwbSurvey;
-	protected Locale _iLocaleID;
+	private Locale _iLocaleID;
+	private IWTimestamp _date;
 	
 	public final static String STYLE = "font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;";
 	public final static String STYLE_2 = "font-family:arial; font-size:8pt; color:#000000; text-align: justify;";
 	public final static String STYLE_BUTTON = "font-family:arial; font-size:8pt; color:#000000; text-align: center; border: 1 solid #000000;";
 
 	
-	protected static final String PRM_SELECTION_PREFIX = "su_q_";
-	protected static final String PRM_ANSWER_IN_TEXT_AREA_PREFIX = "su_q_ta_";
+	private static final String PRM_SELECTION_PREFIX = "su_q_";
+	private static final String PRM_ANSWER_IN_TEXT_AREA_PREFIX = "su_q_ta_";
 	public final static String PRM_MAINTAIN_SUFFIX = "_mt";
-	public static final String PRM_SURVEY_ID = "survey_id";
+	
 	public final static String PRM_PARTICIPANT_IDENTIFIER = "su_p_id";
 	
 	public static final String PRM_QUESTIONS = "su_questions";
@@ -90,16 +91,16 @@ public class Survey extends FolderBlock {
 	public static final int ACTION_NO_ACTION = 0;
 	public static final int ACTION_PARTICIPATE = 1;
 	public static final int ACTION_SURVEYREPLY = 2;
-	protected ICPage resultPage = null;
 	
-	protected int _action = ACTION_NO_ACTION;
-	protected int _lastAction = ACTION_NO_ACTION;
+	private int _action = ACTION_NO_ACTION;
+	private int _lastAction = ACTION_NO_ACTION;
 	
-	protected Vector prmVector = new Vector();
-	protected QueueMap _reply = new QueueMap();
+	private Vector prmVector = new Vector();
+	private HashMap _prmValues = new HashMap();
+	private QueueMap _reply = new QueueMap();
 	
-	protected SurveyBusiness _sBusiness = null;
-	protected SurveyEntity _currentSurvey = null;
+	private SurveyBusiness _sBusiness = null;
+	private SurveyEntity _currentSurvey = null;
 	
 	private String questionTextStyle;// = "font-weight: bold;";
 	private String answerTextStyle;
@@ -119,10 +120,12 @@ public class Survey extends FolderBlock {
 //	private String style_textbox;
 //	private String style_textarea;
 	private String style_submitbutton = "font-family:arial; font-size:8pt; color:#000000; text-align: center; border: 1 solid #000000;";
+	private String style_form_element = "font-family:arial; font-size:8pt; color:#000000; text-align: justify;";
+	
 	public final static String MODE_EDIT = "edit";
 	public static final String MODE_SURVEY = "survey";
 	public static final String MODE_RESULTS = "results";
-	protected String _mode = MODE_SURVEY;
+	private String _mode = MODE_SURVEY;
 	public final static String PRM_MODE = "su_mode";
 	public final static String PRM_SWITCHTO_MODE = "su_swto_mode";
 	
@@ -131,9 +134,9 @@ public class Survey extends FolderBlock {
 	private int textAreaColumns = 50;
 	private int textAreaRows = 8;
 	
-	protected boolean showHelp = true;
-	protected boolean showIdentificationState = true;
-	protected String _participant = null;
+	private boolean showHelp = true;
+	private boolean showIdentificationState = true;
+	private String _participant = null;
 
 
 	/**
@@ -156,6 +159,7 @@ public class Survey extends FolderBlock {
 		this._iwb = iwc.getIWMainApplication().getBundle(IW_CORE_BUNDLE_IDENTIFIER);
 		this._iwbSurvey = getBundle(iwc);
 		this._iLocaleID = iwc.getCurrentLocale();
+		this._date = new IWTimestamp();
 			
 		processParameters(iwc);
 		
@@ -163,16 +167,11 @@ public class Survey extends FolderBlock {
 	}
 	
 	private void initializeSurvey(IWContext iwc) throws IDOLookupException, RemoteException, FinderException{
-		String sSid = iwc.getParameter(PRM_SURVEY_ID);
-		if (sSid == null) {
-			Collection surveys = this._sBusiness.getSurveyHome().findActiveSurveys(this.getWorkFolder().getEntity(),IWTimestamp.RightNow().getTimestamp());	
-			Iterator surveysIter = surveys.iterator();
-			// TODO change
-			while(surveysIter.hasNext()) {
-				this._currentSurvey = (SurveyEntity)surveysIter.next();
-			}
-		} else {
-			this._currentSurvey = this._sBusiness.getSurveyHome().findByPrimaryKey(new Integer(sSid));
+		Collection surveys = this._sBusiness.getSurveyHome().findActiveSurveys(this.getWorkFolder().getEntity(),IWTimestamp.RightNow().getTimestamp());	
+		Iterator surveysIter = surveys.iterator();
+		// TODO change
+		while(surveysIter.hasNext()) {
+			this._currentSurvey = (SurveyEntity)surveysIter.next();
 		}
 	}
 
@@ -251,6 +250,33 @@ public class Survey extends FolderBlock {
 		this._surveyAnswerDifference = allQuestions;		
 	}
 	
+	private void processParameterValues(IWContext iwc, String prmName, boolean maintain){
+		String[] values = iwc.getParameterValues(prmName);
+		if(values != null && values.length > 0){
+			this._prmValues.put(prmName,values);
+			if(maintain){
+				for (int i = 0; i < values.length; i++) {
+					if(values[i] != null && !"".equals(values[i])){
+						this.prmVector.add(new Parameter(prmName+PRM_MAINTAIN_SUFFIX,values[i]));
+					}
+				}
+			}
+		} else {
+			values = iwc.getParameterValues(prmName+PRM_MAINTAIN_SUFFIX);
+			if(values != null && values.length > 0){
+				this._prmValues.put(prmName,values);
+				if(maintain){
+					for (int i = 0; i < values.length; i++) {
+						if(values[i] != null && !"".equals(values[i])){
+							this.prmVector.add(new Parameter(prmName+PRM_MAINTAIN_SUFFIX,values[i]));
+						}
+					}
+				}
+			}	
+		}
+	}
+
+	
 	public void main(IWContext iwc) throws Exception {
 		if(this._mode.equals(MODE_EDIT)){
 			SurveyEditor editor = new SurveyEditor(this.getICObjectInstanceID());
@@ -309,7 +335,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @param iwc
 	 */
-	protected void storeReply(IWContext iwc) throws FinderException, IDOLookupException, RemoteException, CreateException {
+	private void storeReply(IWContext iwc) throws FinderException, IDOLookupException, RemoteException, CreateException {
 		
 		Set questions = this._reply.keySet();
 		if(questions != null){
@@ -339,14 +365,8 @@ public class Survey extends FolderBlock {
 	 * @param iwc
 	 * @return
 	 */
-	protected PresentationObject getSurveyPresentation(IWContext iwc) {
-		Form myForm = new Form();
-		if (this.resultPage != null) {
-			myForm.setPageToSubmitTo(this.resultPage);
-			myForm.addParameter(PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
-		} else {
-			myForm.maintainParameter(PRM_SURVEY_ID);
-		}
+	private PresentationObject getSurveyPresentation(IWContext iwc) {
+		Form myForm = new Form();		
 		
 		if(this._currentSurvey != null){
 			Table surveyTable = new Table();
@@ -436,9 +456,9 @@ public class Survey extends FolderBlock {
 	 * @param iwc
 	 * @return
 	 */
-	protected PresentationObject getOpenPresentation(IWContext iwc) {
+	private PresentationObject getOpenPresentation(IWContext iwc) {
 		Form myForm = new Form();		
-		myForm.maintainParameter(PRM_SURVEY_ID);
+		
 		if(this._currentSurvey != null){
 			Table surveyTable = new Table();
 //			surveyTable.setWidth("100%");
@@ -613,7 +633,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	protected PresentationObject getCheckBox(Object name, Object value) {
+	private PresentationObject getCheckBox(Object name, Object value) {
 		CheckBox box = new CheckBox(PRM_SELECTION_PREFIX+name.toString(),value.toString());
 		List answers = (List)this._reply.get(name);
 		if(answers != null){
@@ -630,7 +650,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	protected PresentationObject getRadioButton(Object name, Object value) {
+	private PresentationObject getRadioButton(Object name, Object value) {
 		RadioButton r = new RadioButton(PRM_SELECTION_PREFIX+name.toString(),value.toString());
 		List answers = (List)this._reply.get(name);
 		if(answers != null){
@@ -648,7 +668,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	protected PresentationObject getAnswerTextArea(Object name) {
+	private PresentationObject getAnswerTextArea(Object name) {
 		TextArea aTA = new TextArea(PRM_ANSWER_IN_TEXT_AREA_PREFIX+name);
 		//aTA.setStyleAttribute(style_form_element);
 		
@@ -723,7 +743,7 @@ public class Survey extends FolderBlock {
 		return text;
 	}
 
-	protected Table getAdminPart() {
+	private Table getAdminPart() {
 		Table table = new Table();
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -752,9 +772,34 @@ public class Survey extends FolderBlock {
 		return table;
 	}
 	
+	private PresentationObject getEditLink(){
+		if(this._currentSurvey != null){
+			Image editImage = this._iwb.getImage("shared/edit.gif");
+			Link adminLink = new Link(editImage);
+			adminLink.addParameter(PRM_SWITCHTO_MODE,MODE_EDIT);
+			adminLink.addParameter(SurveyEditor.PRM_SURVEY_ID,this._currentSurvey.getPrimaryKey().toString());
+			return adminLink;
+		} else {
+			return NULL_CLONE_OBJECT;
+		}
+
+	}
+	
+	private PresentationObject getCreateLink(){
+		
+		Image createImage = this._iwb.getImage("shared/create.gif");
+		Link createLink = new Link(createImage);
+		createLink.addParameter(PRM_SWITCHTO_MODE,MODE_EDIT);
+		
+		return createLink;
+
+	}
+	
+	
 	public synchronized Object clone(){
 		Survey clone = (Survey)super.clone();
 		clone._reply = new QueueMap();	
+		clone._prmValues = new HashMap();
 		clone.prmVector = new Vector();
 		return clone;
 	}
@@ -842,7 +887,7 @@ public class Survey extends FolderBlock {
 		this.messageTextHighlightStyle = style;
 	}
 	
-	protected PresentationObject getMessageTextObject(String message, boolean highlight) {
+	private PresentationObject getMessageTextObject(String message, boolean highlight) {
 		Text text = new Text(message);
 		if(!highlight){
 			if(this.messageTextStyle != null){
@@ -862,10 +907,6 @@ public class Survey extends FolderBlock {
 	 */
 	public void setAnswerTextStyle(String style) {
 		this.answerTextStyle = style;
-	}
-
-	public void setResultPage(ICPage resultPage) {
-		this.resultPage = resultPage;
 	}
 
 }
