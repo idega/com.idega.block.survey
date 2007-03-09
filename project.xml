@@ -5,9 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>idegaWeb Survey Block</name>
   <artifactId>com.idega.block.survey</artifactId>
-  <!--currentVersion>1.0.1</currentVersion-->
-
-  <currentVersion>3.1.0</currentVersion>
+  <currentVersion>3.1.1</currentVersion>
   <shortDescription>Survey</shortDescription>
   <versions>
     <version>
@@ -42,29 +40,18 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.core</artifactId>
-      <version>3.1.0</version>
+      <version>3.1.39</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
-      <properties>
-        <!--<j:if test="${idegaweb.project.source.dependent}=='true'}">-->
-
-        <eclipse.dependency>true</eclipse.dependency>
-        <!--</j:if>-->
-
-      </properties>
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.category</artifactId>
-      <version>3.1.0</version>
+      <version>3.1.1</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <!-- <j:if test="${idegaweb.project.source.dependent}=='true'}">-->
-
         <eclipse.dependency>true</eclipse.dependency>
-        <!--</j:if>-->
-
       </properties>
     </dependency>
   </dependencies>
