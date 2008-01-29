@@ -9,7 +9,7 @@
   <groupId>com.idega.block.addon</groupId>
   <artifactId>com.idega.block.survey</artifactId>
   <packaging>jar</packaging>
-  <version>4.0.0</version>
+  <version>4.0.1-SNAPSHOT</version>
   <inceptionYear>2000</inceptionYear>
   <description>Survey</description>
   
@@ -20,7 +20,6 @@
      -->
     <connection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.addon/com.idega.block.survey/</connection>
     <developerConnection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.addon/com.idega.block.survey/</developerConnection>
-    <tag>com_idega_block_addon_super-4_0_0</tag>
   </scm>
   <developers>
     <developer>
@@ -47,7 +46,7 @@
      <dependency>
       <groupId>com.idega.block.legacy</groupId>
       <artifactId>com.idega.block.category</artifactId>
-      <version>4.0.0</version>
+      <version>4.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
   
