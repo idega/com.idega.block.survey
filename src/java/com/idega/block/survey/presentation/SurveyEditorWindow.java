@@ -17,13 +17,13 @@ public class SurveyEditorWindow extends Window {
 		String sInst = iwc.getParameter(PRM_INSTANCE_ID);
 		if (sInst != null) {
 			String mode = iwc.getParameter(Survey.PRM_SWITCHTO_MODE);
-			if (mode.equals(Survey.MODE_EDIT)) {
+			if (mode != null && mode.equals(Survey.MODE_EDIT)) {
 				SurveyEditor se = new SurveyEditor(Integer.parseInt(sInst));
 				se.maintainParameter(PRM_INSTANCE_ID, sInst);
 				se.maintainParameter(Survey.PRM_SWITCHTO_MODE, Survey.MODE_EDIT);
 				add(se);
 			}
-			else if (mode.equals(Survey.MODE_RESULTS)) {
+			else {
 				SurveyResultEditor sre = new SurveyResultEditor();
 				sre.setICObjectInstanceID(Integer.parseInt(sInst));
 				add(sre);
