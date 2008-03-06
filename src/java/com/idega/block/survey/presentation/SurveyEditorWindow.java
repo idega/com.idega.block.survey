@@ -20,6 +20,7 @@ public class SurveyEditorWindow extends Window {
 			if (mode.equals(Survey.MODE_EDIT)) {
 				SurveyEditor se = new SurveyEditor(Integer.parseInt(sInst));
 				se.maintainParameter(PRM_INSTANCE_ID, sInst);
+				se.maintainParameter(Survey.PRM_SWITCHTO_MODE, Survey.MODE_EDIT);
 				add(se);
 			}
 			else if (mode.equals(Survey.MODE_RESULTS)) {
