@@ -428,7 +428,7 @@ public class SurveyResultEditor extends Block {
 						else {
 							++row;
 						}
-						primaryKey = reply.getAnswer() != null ? reply.getSurveyAnswer().getPrimaryKey() : "";
+						primaryKey = reply.getSurveyAnswer() != null ? reply.getSurveyAnswer().getPrimaryKey() : "";
 						for (int i = 2; i < answersIds.length; i++) {
 							if (answersIds[i].equals(primaryKey)) {
 								if (choiceAnswer) {
