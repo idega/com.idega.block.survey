@@ -149,14 +149,6 @@ public class SurveyCSS extends Survey {
 			Heading1 h1 = new Heading1(this._currentSurvey.getName());
 			l.add(h1);
 
-			if (!this._surveyAnswerDifference.isEmpty()) {
-				Layer layer = new Layer();
-				layer.setStyleClass("surveyError");
-				l.add(layer);
-
-				add(new Heading1(this._iwrb.getLocalizedString("you_have_not_answered_all_of_the_questions", "You have not answered all of the questions.")));
-			}
-
 			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
 			try {
 				Collection questions = this._currentSurvey.getSurveyQuestions();
@@ -238,6 +230,14 @@ public class SurveyCSS extends Survey {
 
 			Heading1 h1 = new Heading1(this._currentSurvey.getName());
 			myForm.add(h1);
+
+			if (!this._surveyAnswerDifference.isEmpty()) {
+				Layer layer = new Layer();
+				layer.setStyleClass("surveyError");
+				myForm.add(layer);
+
+				layer.add(new Heading1(this._iwrb.getLocalizedString("you_have_not_answered_all_of_the_questions", "You have not answered all of the questions.")));
+			}
 
 			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
 			try {
