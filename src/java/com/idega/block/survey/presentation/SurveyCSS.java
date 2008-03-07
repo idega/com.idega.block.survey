@@ -9,6 +9,7 @@ import javax.ejb.FinderException;
 import com.idega.block.survey.business.SurveyBusinessBean;
 import com.idega.block.survey.data.SurveyAnswer;
 import com.idega.block.survey.data.SurveyQuestion;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.localisation.data.ICLocale;
 import com.idega.data.IDOLookupException;
@@ -17,6 +18,7 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
+import com.idega.presentation.Span;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading2;
@@ -31,6 +33,7 @@ import com.idega.presentation.ui.Parameter;
 public class SurveyCSS extends Survey {
 
 	private String id = null;
+	private ICPage iBackPage;
 
 	public SurveyCSS() {
 		super();
@@ -102,19 +105,31 @@ public class SurveyCSS extends Survey {
 						add(getSurveyResults(iwc));
 					}
 					else {
-						add(Text.BREAK);
-						add(Text.BREAK);
-						add(getMessageTextObject(this._iwrb.getLocalizedString("survey_has_been_replied", "Thank you for participating"), false));
+						Layer l = new Layer();
+						l.setStyleClass("survey");
+						add(l);
+
+						Heading1 h1 = new Heading1(this._currentSurvey.getName());
+						l.add(h1);
+
+						Layer layer = new Layer();
+						layer.setStyleClass("surveySuccess");
+						layer.add(new Heading1(this._iwrb.getLocalizedString("survey_has_been_replied", "Thank you for participating")));
+						l.add(layer);
+
+						if (getBackPage() != null) {
+							Layer buttons = new Layer(Layer.DIV);
+							buttons.setStyleClass("survey_buttons");
+							l.add(buttons);
+
+							Link back = new Link(new Span(new Text(this._iwrb.getLocalizedString("back", "Back"))));
+							back.setPage(getBackPage());
+							buttons.add(back);
+						}
 					}
 
 				}
 				else {
-
-					if (!this._surveyAnswerDifference.isEmpty()) {
-						add(Text.BREAK);
-						add(getMessageTextObject(this._iwrb.getLocalizedString("you_have_not_answered_all_of_the_questions", "You have not answered all of the questions."), true));
-					}
-
 					add(getSurveyPresentation(iwc));
 				}
 			}
@@ -133,6 +148,14 @@ public class SurveyCSS extends Survey {
 
 			Heading1 h1 = new Heading1(this._currentSurvey.getName());
 			l.add(h1);
+
+			if (!this._surveyAnswerDifference.isEmpty()) {
+				Layer layer = new Layer();
+				layer.setStyleClass("surveyError");
+				l.add(layer);
+
+				add(new Heading1(this._iwrb.getLocalizedString("you_have_not_answered_all_of_the_questions", "You have not answered all of the questions.")));
+			}
 
 			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
 			try {
@@ -367,6 +390,14 @@ public class SurveyCSS extends Survey {
 		}
 
 		return aL;
+	}
+
+	public ICPage getBackPage() {
+		return this.iBackPage;
+	}
+
+	public void setBackPage(ICPage backPage) {
+		this.iBackPage = backPage;
 	}
 
 }
