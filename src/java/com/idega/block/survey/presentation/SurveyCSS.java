@@ -99,7 +99,7 @@ public class SurveyCSS extends Survey {
 
 			}
 			else {
-				if (this._action == ACTION_SURVEYREPLY && this._surveyAnswerDifference.isEmpty()) {
+				if (this._action == ACTION_SURVEYREPLY/* && this._surveyAnswerDifference.isEmpty()*/) {
 					storeReply(iwc);
 					if (this._currentSurvey != null && this._currentSurvey.getSurveyType().getShowResults()) {
 						add(getSurveyResults(iwc));
