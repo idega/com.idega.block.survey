@@ -128,7 +128,14 @@ public class SurveyReplyBMPBean extends GenericEntity implements SurveyReply{
 	}
 	
 	public Collection ejbFindByQuestion(SurveyQuestion question) throws FinderException{
-		Collection coll = this.idoFindAllIDsByColumnOrderedBySQL(COLUMNNAME_QUESTION_ID, question.getPrimaryKey().toString()); 
+		Table table = new Table(this);
+		SelectQuery selectQuery = new SelectQuery(table);
+		selectQuery.addColumn(new WildCardColumn(table));
+		selectQuery.addCriteria(new MatchCriteria(table.getColumn(COLUMNNAME_QUESTION_ID), MatchCriteria.EQUALS, question));
+		selectQuery.addOrder(table, getIDColumnName(), true);
+		
+		Collection coll = this.idoFindPKsBySQL(selectQuery.toString());
+		
 		return coll;
 	}
 	
