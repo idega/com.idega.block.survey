@@ -11,8 +11,6 @@ public interface SurveyAnswerHome extends IDOHome {
 
 	public SurveyAnswer findByPrimaryKey(Object pk) throws FinderException;
 
-	/**
-	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#ejbFindQuestionsAnswer
-	 */
-	public Collection findQuestionsAnswer(SurveyQuestion question) throws FinderException;
+	public Collection findQuestionsAnswer(SurveyQuestion question)
+			throws FinderException;
 }

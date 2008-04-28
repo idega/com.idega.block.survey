@@ -1,7 +1,9 @@
 package com.idega.block.survey.presentation;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.ejb.FinderException;
@@ -29,11 +31,13 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
+import com.idega.presentation.ui.RadioButton;
 
 public class SurveyCSS extends Survey {
 
 	private String id = null;
 	private ICPage iBackPage;
+	private HashMap dependentRadioButtons = new HashMap();
 
 	public SurveyCSS() {
 		super();
@@ -44,7 +48,7 @@ public class SurveyCSS extends Survey {
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 
-		Image createImage = this._iwb.getImage("shared/create.gif");
+		Image createImage = this.iwb.getImage("shared/create.gif");
 		Link createLink = new Link(createImage);
 		createLink.setWindowToOpen(SurveyEditorWindow.class);
 		createLink.addParameter(SurveyEditorWindow.PRM_INSTANCE_ID, super.getICObjectInstanceID());
@@ -53,21 +57,21 @@ public class SurveyCSS extends Survey {
 
 		table.add(createLink);
 
-		if (this._currentSurvey != null) {
-			Image editImage = this._iwb.getImage("shared/edit.gif");
+		if (this.currentSurvey != null) {
+			Image editImage = this.iwb.getImage("shared/edit.gif");
 			Link adminLink = new Link(editImage);
 			adminLink.setWindowToOpen(SurveyEditorWindow.class);
 			adminLink.addParameter(SurveyEditorWindow.PRM_INSTANCE_ID, super.getICObjectInstanceID());
 			adminLink.addParameter(PRM_SWITCHTO_MODE, MODE_EDIT);
-			adminLink.addParameter(SurveyEditor.PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
+			adminLink.addParameter(SurveyEditor.PRM_SURVEY_ID, this.currentSurvey.getPrimaryKey().toString());
 			table.add(adminLink);
 
-			Image resultImage = this._iwb.getImage("shared/info.gif");
+			Image resultImage = this.iwb.getImage("shared/info.gif");
 			Link resultLink = new Link(resultImage);
 			resultLink.setWindowToOpen(SurveyEditorWindow.class);
 			resultLink.addParameter(SurveyEditorWindow.PRM_INSTANCE_ID, super.getICObjectInstanceID());
 			resultLink.addParameter(PRM_SWITCHTO_MODE, MODE_RESULTS);
-			resultLink.addParameter(SurveyResultEditor.PARAMETER_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
+			resultLink.addParameter(SurveyResultEditor.PARAMETER_SURVEY_ID, this.currentSurvey.getPrimaryKey().toString());
 			table.add(resultLink);
 		}
 
@@ -76,32 +80,29 @@ public class SurveyCSS extends Survey {
 
 	public void main(IWContext iwc) throws Exception {
 
-		if (this._mode.equals(MODE_EDIT)) {
+		if (this.mode.equals(MODE_EDIT)) {
 			SurveyEditor editor = new SurveyEditor(this.getICObjectInstanceID());
 			add(editor);
 		}
-		else if (this._mode.equals(MODE_RESULTS)) {
+		else if (this.mode.equals(MODE_RESULTS)) {
 			SurveyResultEditor editor = new SurveyResultEditor();
 			add(editor);
 		}
 		else {
 			if (this.hasEditPermission()) {
-				// TODO ATH CSS
 				add(getAdminPart());
 				if (this.showHelp) {
 					add(getHelp("su_help_survey"));
 				}
 			}
 
-			if (this._action == ACTION_NO_ACTION && this.showIdentificationState) {
-				// TODO ATH CSS
+			if (this.action == ACTION_NO_ACTION && this.showIdentificationState) {
 				add(getOpenPresentation(iwc));
-
 			}
 			else {
-				if (this._action == ACTION_SURVEYREPLY/* && this._surveyAnswerDifference.isEmpty()*/) {
+				if (this.action == ACTION_SURVEYREPLY) {
 					storeReply(iwc);
-					if (this._currentSurvey != null && this._currentSurvey.getSurveyType().getShowResults()) {
+					if (this.currentSurvey != null && this.currentSurvey.getSurveyType().getShowResults()) {
 						add(getSurveyResults(iwc));
 					}
 					else {
@@ -109,12 +110,12 @@ public class SurveyCSS extends Survey {
 						l.setStyleClass("survey");
 						add(l);
 
-						Heading1 h1 = new Heading1(this._currentSurvey.getName());
+						Heading1 h1 = new Heading1(this.currentSurvey.getName());
 						l.add(h1);
 
 						Layer layer = new Layer();
 						layer.setStyleClass("surveySuccess");
-						layer.add(new Heading1(this._iwrb.getLocalizedString("survey_has_been_replied", "Thank you for participating")));
+						layer.add(new Heading1(this.iwrb.getLocalizedString("survey_has_been_replied", "Thank you for participating")));
 						l.add(layer);
 
 						if (getBackPage() != null) {
@@ -122,7 +123,7 @@ public class SurveyCSS extends Survey {
 							buttons.setStyleClass("survey_buttons");
 							l.add(buttons);
 
-							Link back = new Link(new Span(new Text(this._iwrb.getLocalizedString("back", "Back"))));
+							Link back = new Link(new Span(new Text(this.iwrb.getLocalizedString("back", "Back"))));
 							back.setPage(getBackPage());
 							buttons.add(back);
 						}
@@ -144,21 +145,21 @@ public class SurveyCSS extends Survey {
 		Layer l = new Layer();
 		l.setStyleClass("survey");
 
-		if (this._currentSurvey != null) {
+		if (this.currentSurvey != null) {
 
-			Heading1 h1 = new Heading1(this._currentSurvey.getName());
+			Heading1 h1 = new Heading1(this.currentSurvey.getName());
 			l.add(h1);
 
-			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
+			ICLocale locale = ICLocaleBusiness.getICLocale(this.iLocaleID);
 			try {
-				Collection questions = this._currentSurvey.getSurveyQuestions();
+				Collection questions = this.currentSurvey.getSurveyQuestions();
 				int questionNumber = 1;
 				for (Iterator iter = questions.iterator(); iter.hasNext(); questionNumber++) {
 					SurveyQuestion question = (SurveyQuestion) iter.next();
 
 					boolean highlight = false;
 					String qPK = question.getPrimaryKey().toString();
-					highlight = this._surveyAnswerDifference.contains(qPK);
+					highlight = this.surveyAnswerDifference.contains(qPK);
 
 					Layer qL = new Layer(Layer.DIV);
 					qL.setStyleClass("survey_question");
@@ -194,13 +195,13 @@ public class SurveyCSS extends Survey {
 
 			Layer corr = new Layer(Layer.SPAN);
 			corr.setStyleClass("selected_correct");
-			corr.add(this._iwrb.getLocalizedString("correct_answer", "Correct answer"));
+			corr.add(this.iwrb.getLocalizedString("correct_answer", "Correct answer"));
 			Layer inc = new Layer(Layer.SPAN);
 			inc.setStyleClass("selected_incorrect");
-			inc.add(this._iwrb.getLocalizedString("incorrect_answer", "Incorrect answer"));
+			inc.add(this.iwrb.getLocalizedString("incorrect_answer", "Incorrect answer"));
 			Layer right = new Layer(Layer.SPAN);
 			right.setStyleClass("correct");
-			right.add(this._iwrb.getLocalizedString("correct_option", "Correct option"));
+			right.add(this.iwrb.getLocalizedString("correct_option", "Correct option"));
 
 			legend.add(corr);
 			legend.add(inc);
@@ -217,7 +218,7 @@ public class SurveyCSS extends Survey {
 		Form myForm = new Form();
 		if (this.resultPage != null) {
 			myForm.setPageToSubmitTo(this.resultPage);
-			myForm.addParameter(PRM_SURVEY_ID, this._currentSurvey.getPrimaryKey().toString());
+			myForm.addParameter(PRM_SURVEY_ID, this.currentSurvey.getPrimaryKey().toString());
 		}
 		else {
 			myForm.maintainParameter(PRM_SURVEY_ID);
@@ -226,38 +227,43 @@ public class SurveyCSS extends Survey {
 			myForm.setId(this.id);
 		}
 		myForm.setStyleClass("survey");
-		if (this._currentSurvey != null) {
+		if (this.currentSurvey != null) {
 
-			Heading1 h1 = new Heading1(this._currentSurvey.getName());
+			Heading1 h1 = new Heading1(this.currentSurvey.getName());
 			myForm.add(h1);
 
-			if (!this._surveyAnswerDifference.isEmpty()) {
+			if (!this.surveyAnswerDifference.isEmpty()) {
 				Layer layer = new Layer();
 				layer.setStyleClass("surveyError");
 				myForm.add(layer);
 
-				layer.add(new Heading1(this._iwrb.getLocalizedString("you_have_not_answered_all_of_the_questions", "You have not answered all of the questions.")));
+				layer.add(new Heading1(this.iwrb.getLocalizedString("you_have_not_answered_all_of_the_questions", "You have not answered all of the questions.")));
 			}
 
-			ICLocale locale = ICLocaleBusiness.getICLocale(this._iLocaleID);
+			ICLocale locale = ICLocaleBusiness.getICLocale(this.iLocaleID);
 			try {
-				Collection questions = this._currentSurvey.getSurveyQuestions();
+				Collection questions = this.currentSurvey.getSurveyQuestions();
 				int questionNumber = 1;
 				for (Iterator iter = questions.iterator(); iter.hasNext(); questionNumber++) {
 					SurveyQuestion question = (SurveyQuestion) iter.next();
 
 					boolean highlight = false;
 					String qPK = question.getPrimaryKey().toString();
-					highlight = this._surveyAnswerDifference.contains(qPK);
+					highlight = this.surveyAnswerDifference.contains(qPK);
 
 					Layer qL = new Layer(Layer.DIV);
 					qL.setStyleClass("survey_question");
 					qL.add(new HiddenInput(PRM_QUESTIONS, qPK));
 					myForm.add(qL);
 
-					Heading2 h2 = new Heading2(questionNumber + ". ");
+					String headingText = questionNumber + ". ";
+					if (question.getQuestionDisplayNumber() != null) {
+						headingText = question.getQuestionDisplayNumber() + " ";
+					}
+					
+					Heading2 h2 = new Heading2(headingText);
 					try {
-						h2 = new Heading2(questionNumber + ". " + question.getQuestion(locale));
+						h2 = new Heading2(headingText + question.getQuestion(locale));
 					}
 					catch (IDOLookupException e1) {
 						e1.printStackTrace();
@@ -271,13 +277,11 @@ public class SurveyCSS extends Survey {
 					qL.add(h2);
 
 					qL.add(getAnswerLayer(iwc, question, locale, false));
-					//					qL.add(getAnswerTable(question, locale),2,(surveyTable.getRows()+1));
-
 				}
 				Layer submit = new Layer(Layer.DIV);
 				submit.setStyleClass("survey_buttons");
 				Layer sL = new Layer(Layer.SPAN);
-				sL.add(this._iwrb.getLocalizedString("submit", "Submit"));
+				sL.add(this.iwrb.getLocalizedString("submit", "Submit"));
 				Link submitLink = new Link(sL);
 				submitLink.setFormToSubmit(myForm, false);
 				myForm.addParameter(PRM_ACTION, String.valueOf(ACTION_SURVEYREPLY));
@@ -294,7 +298,7 @@ public class SurveyCSS extends Survey {
 		else {
 			Layer l = new Layer();
 			l.setStyleClass("survey_message");
-			l.add(this._iwrb.getLocalizedString("no_survey_defined", "No survey defined"));
+			l.add(this.iwrb.getLocalizedString("no_survey_defined", "No survey defined"));
 			myForm.add(l);
 		}
 
@@ -305,10 +309,29 @@ public class SurveyCSS extends Survey {
 		return myForm;
 	}
 
+	private void checkParent(DependantRadioButtonHolder holder, String disableName) {
+		if (holder.getQuestion().getDependantOnQuestion() != null) {
+			ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(holder.getQuestion().getDependantOnQuestion().getPrimaryKey());
+			if (buttons != null) {
+				Iterator it = buttons.iterator();
+				while (it.hasNext()) {
+					DependantRadioButtonHolder holder2 = (DependantRadioButtonHolder) it.next();
+					if (holder2.getAnswer().getDisableDependantQuestions()) {
+						holder2.getButton().setToDisableOnClick(disableName, true);								
+					} else {
+						holder2.getButton().setToDisableOnClick(disableName, false);																
+					}
+					
+					checkParent(holder2, disableName);
+				}
+			}			
+		}
+	}
+	
 	private Layer getAnswerLayer(IWContext iwc, SurveyQuestion question, ICLocale locale, boolean results) {
 		Layer aL = new Layer(Layer.DIV);
 		aL.setStyleClass("survey_answers");
-
+		
 		try {
 			if (question.getAnswerType() == SurveyBusinessBean.ANSWERTYPE_TEXTAREA) {
 				Lists lists = new Lists();
@@ -318,9 +341,26 @@ public class SurveyCSS extends Survey {
 				lists.add(li);
 				li.add(new HiddenInput(PRM_SELECTION_PREFIX + question.getPrimaryKey().toString(), question.getPrimaryKey().toString()));
 				li.add(getAnswerTextArea(question.getPrimaryKey()));
+				
+				if (question.getDependantOnQuestion() != null) {
+					ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(question.getDependantOnQuestion().getPrimaryKey());
+					if (buttons != null) {
+						Iterator it = buttons.iterator();
+						while (it.hasNext()) {
+							DependantRadioButtonHolder holder = (DependantRadioButtonHolder) it.next();
+							if (holder.getAnswer().getDisableDependantQuestions()) {
+								holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), true);								
+							} else {
+								holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), false);																
+							}
+							
+							checkParent(holder, PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey());
+						}
+					}
+				}
 			}
 			else {
-				Collection answers = this._sBusiness.getAnswerHome().findQuestionsAnswer(question);
+				Collection answers = this.sBusiness.getAnswerHome().findQuestionsAnswer(question);
 
 				Lists lists = new Lists();
 				aL.add(lists);
@@ -339,7 +379,20 @@ public class SurveyCSS extends Survey {
 						switch (question.getAnswerType()) {
 							case SurveyBusinessBean.ANSWERTYPE_SINGLE_CHOICE:
 								lists.setStyleClass("radiobutton");
-								li.add(getRadioButton(question.getPrimaryKey(), answer.getPrimaryKey()));
+								PresentationObject button = getRadioButton(question.getPrimaryKey(), answer.getPrimaryKey());
+								li.add(button);
+								if (question.getHasDependantQuestions()) {
+									ArrayList buttons = null;
+									if (this.dependentRadioButtons.containsKey(question.getPrimaryKey())) {
+										buttons = (ArrayList) this.dependentRadioButtons.get(question.getPrimaryKey());
+									} else {
+										buttons = new ArrayList();
+									}
+									
+									buttons.add(new DependantRadioButtonHolder(question, answer, (RadioButton)button));
+									this.dependentRadioButtons.put(question.getPrimaryKey(), buttons);
+								}
+								
 								break;
 
 							case SurveyBusinessBean.ANSWERTYPE_MULTI_CHOICE:
@@ -375,8 +428,24 @@ public class SurveyCSS extends Survey {
 					catch (FinderException e1) {
 						e1.printStackTrace();
 					}
+					
+					if (question.getDependantOnQuestion() != null) {
+						ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(question.getDependantOnQuestion().getPrimaryKey());
+						if (buttons != null) {
+							Iterator it = buttons.iterator();
+							while (it.hasNext()) {
+								DependantRadioButtonHolder holder = (DependantRadioButtonHolder) it.next();
+								if (holder.getAnswer().getDisableDependantQuestions()) {
+									holder.getButton().setToDisableOnClick(PRM_SELECTION_PREFIX + question.getPrimaryKey(), true);								
+								} else {
+									holder.getButton().setToDisableOnClick(PRM_SELECTION_PREFIX + question.getPrimaryKey(), false);																
+								}
+								
+								checkParent(holder, PRM_SELECTION_PREFIX + question.getPrimaryKey());
+							}
+						}
+					}
 				}
-
 			}
 		}
 		catch (IDOLookupException e) {
@@ -400,4 +469,28 @@ public class SurveyCSS extends Survey {
 		this.iBackPage = backPage;
 	}
 
+	
+	private class DependantRadioButtonHolder {
+		protected RadioButton button = null;
+		protected SurveyQuestion question = null;
+		protected SurveyAnswer answer = null;
+		
+		public DependantRadioButtonHolder(SurveyQuestion question, SurveyAnswer answer, RadioButton button) {
+			this.question = question;
+			this.answer = answer;
+			this.button = button;
+		}
+		
+		public SurveyAnswer getAnswer() {
+			return this.answer;
+		}
+		
+		public SurveyQuestion getQuestion() {
+			return this.question;
+		}
+		
+		public RadioButton getButton() {
+			return this.button;
+		}
+	}
 }

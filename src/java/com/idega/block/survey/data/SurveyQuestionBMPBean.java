@@ -10,155 +10,161 @@ import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
 import com.idega.core.localisation.data.ICLocale;
+import com.idega.data.GenericEntity;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
-import com.idega.util.IWTimestamp;
 import com.idega.user.data.User;
-
+import com.idega.util.IWTimestamp;
 
 /**
- * Title:		SurveyQuestionBMPBean
- * Description:
- * Copyright:	Copyright (c) 2004
- * Company:		idega Software
- * @author		2004 - idega team - <br><a href="mailto:gummi@idega.is">Gudmundur Agust Saemundsson</a><br>
- * @version		1.0
+ * Title: SurveyQuestionBMPBean Description: Copyright: Copyright (c) 2004
+ * Company: idega Software
+ * 
+ * @author 2004 - idega team - <br>
+ *         <a href="mailto:gummi@idega.is">Gudmundur Agust Saemundsson</a><br>
+ * @version 1.0
  */
 
-public class SurveyQuestionBMPBean extends com.idega.data.GenericEntity implements SurveyQuestion{
-	
-	private HashMap storeMap = new HashMap();
-	public static final String COLUMNNAME_CREATION_LOCALE = "CREATION_LOCALE";	
+public class SurveyQuestionBMPBean extends GenericEntity implements
+		SurveyQuestion {
 
-	private final static String DELETED_COLUMN = "DELETED";
-	private final static String DELETED_BY_COLUMN = "DELETED_BY";
-	private final static String DELETED_WHEN_COLUMN = "DELETED_WHEN";
+	protected static final String ENTITY_NAME = "SU_SURVEY_QUESTION";
+
+	private HashMap storeMap = new HashMap();
+	public static final String COLUMNNAME_CREATION_LOCALE = "CREATION_LOCALE";
+
+	private final static String COLUMN_ANSWER_TYPE = "ANSWER_TYPE";
+	private final static String COLUMN_DELETED = "DELETED";
+	private final static String COLUMN_DELETED_BY = "DELETED_BY";
+	private final static String COLUMN_DELETED_WHEN = "DELETED_WHEN";
+
+	protected final static String COLUMN_DEPENDANT_ON_QUESTION = "dependant_on_question";
+	protected final static String COLUMN_HAS_DEPENDANT_QUESTIONS = "has_dependant";
+	protected final static String COLUMN_QUESTION_NUMBER = "question_number";
+
 	public final static String DELETED = "Y";
 	public final static String NOT_DELETED = "N";
 
-	
-	public SurveyQuestionBMPBean() {
-		super();
-	}
-
-	public SurveyQuestionBMPBean(int id) throws SQLException {
-		super(id);
-	}
-
 	public void initializeAttributes() {
 		addAttribute(getIDColumnName());
-//		addAttribute(getColumnNameMultiChoice(), "Multi-Choice",true,true,Boolean.class);
-		addAttribute(getColumnNameAnswerType(), "Answer type",true,true,String.class,1);
-		setNullable(getColumnNameAnswerType(),false);
-		
-		addManyToOneRelationship(COLUMNNAME_CREATION_LOCALE, "Locale id", ICLocale.class);
-
-		addAttribute(DELETED_COLUMN, "Deleted", true, true, String.class, 1);
-		addAttribute(DELETED_BY_COLUMN, "Deleted by", true, true, Integer.class, "many-to-one", User.class);
-		addAttribute(DELETED_WHEN_COLUMN, "Deleted when", true, true, Timestamp.class);
-
-	}
-
-	
-//	public static String getColumnNameMultiChoice(){
-//		return "MULTI_CHOICE";
-//	}
-	
-	public static String getColumnNameAnswerType(){
-		return "ANSWER_TYPE";
+		addAttribute(COLUMN_ANSWER_TYPE, "Answer type", String.class, 1);
+		setNullable(COLUMN_ANSWER_TYPE, false);
+		addManyToOneRelationship(COLUMNNAME_CREATION_LOCALE, ICLocale.class);
+		addAttribute(COLUMN_DELETED, "Deleted", String.class, 1);
+		addManyToOneRelationship(COLUMN_DELETED_BY, User.class);
+		addAttribute(COLUMN_DELETED_WHEN, "Deleted when", Timestamp.class);
+		addManyToOneRelationship(COLUMN_DEPENDANT_ON_QUESTION,
+				SurveyQuestion.class);
+		addAttribute(COLUMN_HAS_DEPENDANT_QUESTIONS, "Has dependant questions", Boolean.class);
+		addAttribute(COLUMN_QUESTION_NUMBER, "Question display number", String.class);
 	}
 
 	public String getEntityName() {
-		return "SU_SURVEY_QUESTION";
+		return ENTITY_NAME;
 	}
 
-//	public void setMultiChoice(boolean value){
-//		setColumn(getColumnNameMultiChoice(),value);
-//	}
-//	
-//	public void setMultiChoice(Boolean value){
-//		setColumn(getColumnNameMultiChoice(),value);
-//	}
-	
-	public void setAnswerType(char value){
-		setColumn(getColumnNameAnswerType(),value);
-	}
-	
-	public char getAnswerType(){
-		return getCharColumnValue(getColumnNameAnswerType());
-	}
-	
-	public String getQuestion(ICLocale locale) throws IDOLookupException, FinderException{
-		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome)IDOLookup.getHome(SurveyQuestionTranslation.class);
-		SurveyQuestionTranslation qTR;
-		try {
-			qTR = sqtHome.findQuestionTranslation(this, locale);
-		} catch (FinderException e) {
-			qTR = sqtHome.findQuestionTranslation(this, this.getCreationLocale());
-		}
-		return qTR.getQuestion();
-	}
-	
-	public void setQuestion(String question, ICLocale locale) throws IDOLookupException, CreateException{
-		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome)IDOLookup.getHome(SurveyQuestionTranslation.class);
-		SurveyQuestionTranslation qTR = null;
-		try {
-			qTR = sqtHome.findQuestionTranslation(this,locale);
-		} catch (FinderException e) {
-			qTR = sqtHome.create();
-			qTR.setLocale(locale);
-			if(this.getCreationLocale()== null){
-				this.setCreationLocale(locale);
-			}
-		}
-		
-		qTR.setQuestion(question);
-		
-		this.storeMap.put(locale,qTR);
-	}
-	
-	public void setCreationLocale(ICLocale locale){
-		setColumn(COLUMNNAME_CREATION_LOCALE,locale);
-	}
-	
-	public ICLocale getCreationLocale(){
-		return (ICLocale)getColumnValue(COLUMNNAME_CREATION_LOCALE);
-	}
-	
-	
-	public void store(){
+	public void store() {
 		super.store();
 		Collection translations = this.storeMap.values();
 		for (Iterator iter = translations.iterator(); iter.hasNext();) {
-			SurveyQuestionTranslation element = (SurveyQuestionTranslation)iter.next();
+			SurveyQuestionTranslation element = (SurveyQuestionTranslation) iter
+					.next();
 			element.setTransletedEntity(this);
 			element.store();
 		}
 	}
+
+	// getters
+	public char getAnswerType() {
+		return getCharColumnValue(COLUMN_ANSWER_TYPE);
+	}
+
+	public ICLocale getCreationLocale() {
+		return (ICLocale) getColumnValue(COLUMNNAME_CREATION_LOCALE);
+	}
+
+	public String getQuestion(ICLocale locale) throws IDOLookupException,
+			FinderException {
+		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome) IDOLookup
+				.getHome(SurveyQuestionTranslation.class);
+		SurveyQuestionTranslation qTR;
+		try {
+			qTR = sqtHome.findQuestionTranslation(this, locale);
+		} catch (FinderException e) {
+			qTR = sqtHome.findQuestionTranslation(this, this
+					.getCreationLocale());
+		}
+		return qTR.getQuestion();
+	}
+
+	public SurveyQuestion getDependantOnQuestion() {
+		return (SurveyQuestion) getColumnValue(COLUMN_DEPENDANT_ON_QUESTION);
+	}
 	
-	/**
-	 *
-	 */
-	public void setRemoved(User user){
-		setColumn(DELETED_COLUMN, DELETED);
+	public boolean getHasDependantQuestions() {
+		return getBooleanColumnValue(COLUMN_HAS_DEPENDANT_QUESTIONS, false);
+	}
+	
+	public String getQuestionDisplayNumber() {
+		return getStringColumnValue(COLUMN_QUESTION_NUMBER);
+	}
+	
+	// setters
+	public void setAnswerType(char value) {
+		setColumn(COLUMN_ANSWER_TYPE, value);
+	}
+
+	public void setQuestion(String question, ICLocale locale)
+			throws IDOLookupException, CreateException {
+		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome) IDOLookup
+				.getHome(SurveyQuestionTranslation.class);
+		SurveyQuestionTranslation qTR = null;
+		try {
+			qTR = sqtHome.findQuestionTranslation(this, locale);
+		} catch (FinderException e) {
+			qTR = sqtHome.create();
+			qTR.setLocale(locale);
+			if (this.getCreationLocale() == null) {
+				this.setCreationLocale(locale);
+			}
+		}
+
+		qTR.setQuestion(question);
+
+		this.storeMap.put(locale, qTR);
+	}
+
+	public void setCreationLocale(ICLocale locale) {
+		setColumn(COLUMNNAME_CREATION_LOCALE, locale);
+	}
+
+	public void setRemoved(User user) {
+		setColumn(COLUMN_DELETED, DELETED);
 		setDeletedWhen(IWTimestamp.getTimestampRightNow());
 		setDeletedBy(user);
 
 		super.store();
 	}
 
-	/**
-	 *
-	 */
 	private void setDeletedBy(User user) {
-		setColumn(DELETED_BY_COLUMN, user);
-	}
-	
-	/**
-	 *
-	 */
-	private void setDeletedWhen(Timestamp when) {
-		setColumn(DELETED_WHEN_COLUMN, when);
+		setColumn(COLUMN_DELETED_BY, user);
 	}
 
+	private void setDeletedWhen(Timestamp when) {
+		setColumn(COLUMN_DELETED_WHEN, when);
+	}
+
+	public void setDependantOnQuestion(SurveyQuestion question) {
+		setColumn(COLUMN_DEPENDANT_ON_QUESTION, question);
+	}
+	
+	public void setHasDepandantQuestions(boolean hasDependantQuestions) {
+		setColumn(COLUMN_HAS_DEPENDANT_QUESTIONS, hasDependantQuestions);
+	}
+	
+	public void setQuestionDisplayNumber(String displayNumber) {
+		setColumn(COLUMN_QUESTION_NUMBER, displayNumber);
+	}
+	
+	// ejb
 }

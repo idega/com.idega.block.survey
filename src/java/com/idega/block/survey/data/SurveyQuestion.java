@@ -1,12 +1,83 @@
 package com.idega.block.survey.data;
 
 
-public interface SurveyQuestion extends com.idega.data.IDOEntity
-{
- public char getAnswerType();
- public java.lang.String getQuestion(com.idega.core.localisation.data.ICLocale p0)throws com.idega.data.IDOLookupException,javax.ejb.FinderException;
- public void setAnswerType(char p0);
- public void setQuestion(java.lang.String p0,com.idega.core.localisation.data.ICLocale p1)throws com.idega.data.IDOLookupException,javax.ejb.CreateException;
- public void setRemoved(com.idega.user.data.User p0);
- public void store();
+import com.idega.core.localisation.data.ICLocale;
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+import com.idega.data.IDOLookupException;
+import com.idega.user.data.User;
+import com.idega.data.IDOEntity;
+
+public interface SurveyQuestion extends IDOEntity {
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#store
+	 */
+	public void store();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#getAnswerType
+	 */
+	public char getAnswerType();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#getCreationLocale
+	 */
+	public ICLocale getCreationLocale();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#getQuestion
+	 */
+	public String getQuestion(ICLocale locale) throws IDOLookupException,
+			FinderException;
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#getDependantOnQuestion
+	 */
+	public SurveyQuestion getDependantOnQuestion();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#getHasDependantQuestions
+	 */
+	public boolean getHasDependantQuestions();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#getQuestionDisplayNumber
+	 */
+	public String getQuestionDisplayNumber();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setAnswerType
+	 */
+	public void setAnswerType(char value);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setQuestion
+	 */
+	public void setQuestion(String question, ICLocale locale)
+			throws IDOLookupException, CreateException;
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setCreationLocale
+	 */
+	public void setCreationLocale(ICLocale locale);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setRemoved
+	 */
+	public void setRemoved(User user);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setDependantOnQuestion
+	 */
+	public void setDependantOnQuestion(SurveyQuestion question);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setHasDepandantQuestions
+	 */
+	public void setHasDepandantQuestions(boolean hasDependantQuestions);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyQuestionBMPBean#setQuestionDisplayNumber
+	 */
+	public void setQuestionDisplayNumber(String displayNumber);
 }

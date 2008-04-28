@@ -22,12 +22,14 @@ public interface SurveyAnswer extends IDOEntity {
 	/**
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#getAnswer
 	 */
-	public String getAnswer(ICLocale locale) throws IDOLookupException, FinderException;
+	public String getAnswer(ICLocale locale) throws IDOLookupException,
+			FinderException;
 
 	/**
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#setAnswer
 	 */
-	public void setAnswer(String question, ICLocale locale) throws IDOLookupException, CreateException;
+	public void setAnswer(String question, ICLocale locale)
+			throws IDOLookupException, CreateException;
 
 	/**
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#useTextInput
@@ -53,6 +55,16 @@ public interface SurveyAnswer extends IDOEntity {
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#getCreationLocale
 	 */
 	public ICLocale getCreationLocale();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#getDisableDependantQuestions
+	 */
+	public boolean getDisableDependantQuestions();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#setDisableDepenantQuestions
+	 */
+	public void setDisableDepenantQuestions(boolean disable);
 
 	/**
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#store

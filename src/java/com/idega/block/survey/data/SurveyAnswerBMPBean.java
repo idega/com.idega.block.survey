@@ -32,6 +32,7 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 	public static final String COLUMNNAME_QUESTION_ID = "SU_SURVEY_QUESTION_ID";
 	public static final String COLUMNNAME_CREATION_LOCALE = "CREATION_LOCALE";	
 	private static final String COLUMN_CORRECT = "CORRECT";
+	private static final String COLUMN_DISABLE_DEPENDANT = "disable_dependant";
 	
 	private final static String DELETED_COLUMN = "DELETED";
 	private final static String DELETED_BY_COLUMN = "DELETED_BY";
@@ -56,11 +57,11 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 		addAttribute(COLUMNNAME_TEXT_INPUT,"Text input",true,true,Boolean.class);
 		addAttribute(COLUMN_CORRECT, "repps", Boolean.class);
 		addManyToOneRelationship(COLUMNNAME_CREATION_LOCALE, "Locale id", ICLocale.class);
+		addAttribute(COLUMN_DISABLE_DEPENDANT, "Disable dependant question if 'true'", Boolean.class);
 
 		addAttribute(DELETED_COLUMN, "Deleted", true, true, String.class, 1);
 		addAttribute(DELETED_BY_COLUMN, "Deleted by", true, true, Integer.class, "many-to-one", User.class);
 		addAttribute(DELETED_WHEN_COLUMN, "Deleted when", true, true, Timestamp.class);
-
 	}
 
 	public String getEntityName() {
@@ -143,6 +144,14 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 		return (ICLocale)getColumnValue(COLUMNNAME_CREATION_LOCALE);
 	}
 	
+	public boolean getDisableDependantQuestions() {
+		return getBooleanColumnValue(COLUMN_DISABLE_DEPENDANT, false);
+	}
+	
+	public void setDisableDepenantQuestions(boolean disable) {
+		setColumn(COLUMN_DISABLE_DEPENDANT, disable);
+	}
+	
 	public void store(){
 		super.store();
 		Collection translations = this.storeMap.values();
@@ -153,7 +162,6 @@ public class SurveyAnswerBMPBean extends com.idega.data.GenericEntity implements
 		}
 	}
 	
-
 	/**
 	 *
 	 */
