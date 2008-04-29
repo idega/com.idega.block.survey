@@ -1,21 +1,92 @@
 package com.idega.block.survey.data;
 
 
-public interface SurveyReply extends com.idega.data.IDOEntity
-{
- public static final int SURVEY_ANSWER_MAX_LENGTH = 500;
-	
- public java.lang.String getAnswer();
- public java.lang.String getParticipantKey();
- public com.idega.block.survey.data.SurveyQuestion getQuestion();
- public com.idega.block.survey.data.SurveyEntity getSurvey();
- public com.idega.block.survey.data.SurveyAnswer getSurveyAnswer();
- public void setAnswer(java.lang.String p0);
- public void setAnswer(com.idega.block.survey.data.SurveyAnswer p0);
- public void setAnswerPK(java.lang.Object p0);
- public void setParticipantKey(java.lang.String p0);
- public void setQuestion(com.idega.block.survey.data.SurveyQuestion p0);
- public void setQuestionPK(java.lang.Object p0);
- public void setSurvey(com.idega.block.survey.data.SurveyEntity p0);
- public void setSurveyPK(java.lang.Object p0);
+import java.sql.Timestamp;
+import com.idega.data.IDOEntity;
+
+public interface SurveyReply extends IDOEntity {
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setParticipantKey
+	 */
+	public void setParticipantKey(String key);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setAnswer
+	 */
+	public void setAnswer(String answer);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setAnswer
+	 */
+	public void setAnswer(SurveyAnswer answer);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setSurvey
+	 */
+	public void setSurvey(SurveyEntity survey);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setQuestion
+	 */
+	public void setQuestion(SurveyQuestion question);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setAnswerPK
+	 */
+	public void setAnswerPK(Object answer);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setSurveyPK
+	 */
+	public void setSurveyPK(Object survey);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setQuestionPK
+	 */
+	public void setQuestionPK(Object question);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setParticipant
+	 */
+	public void setParticipant(SurveyParticipant participant);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#setEntryDate
+	 */
+	public void setEntryDate(Timestamp entryDate);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getParticipantKey
+	 */
+	public String getParticipantKey();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getAnswer
+	 */
+	public String getAnswer();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getSurveyAnswer
+	 */
+	public SurveyAnswer getSurveyAnswer();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getSurvey
+	 */
+	public SurveyEntity getSurvey();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getQuestion
+	 */
+	public SurveyQuestion getQuestion();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getParticipant
+	 */
+	public SurveyParticipant getParticipant();
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyReplyBMPBean#getEntryDate
+	 */
+	public Timestamp getEntryDate();
 }

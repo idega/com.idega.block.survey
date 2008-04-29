@@ -1,11 +1,25 @@
 package com.idega.block.survey.data;
 
 
-public interface SurveyParticipantHome extends com.idega.data.IDOHome
-{
- public SurveyParticipant create() throws javax.ejb.CreateException;
- public SurveyParticipant findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
- public java.util.Collection findRandomParticipants(com.idega.block.survey.data.SurveyEntity p0,int p1,boolean p2)throws javax.ejb.FinderException;
- public int getNumberOfParticipations(com.idega.block.survey.data.SurveyEntity p0,java.lang.String p1)throws com.idega.data.IDOException;
+import com.idega.data.IDOException;
+import java.util.Collection;
+import javax.ejb.CreateException;
+import com.idega.data.IDOHome;
+import javax.ejb.FinderException;
+import com.idega.user.data.User;
 
+public interface SurveyParticipantHome extends IDOHome {
+	public SurveyParticipant create() throws CreateException;
+
+	public SurveyParticipant findByPrimaryKey(Object pk) throws FinderException;
+
+	public int getNumberOfParticipations(SurveyEntity survey, String name)
+			throws IDOException;
+
+	public Collection findRandomParticipants(SurveyEntity survey,
+			int maxNumberOfReturnedParticipants, boolean evenChance)
+			throws FinderException;
+
+	public SurveyParticipant findParticipant(SurveyEntity survey, User user)
+			throws FinderException;
 }

@@ -5,7 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>idegaWeb Survey Block</name>
   <artifactId>com.idega.block.survey</artifactId>
-  <currentVersion>3.1.3</currentVersion>
+  <currentVersion>3.1.4</currentVersion>
   <shortDescription>Survey</shortDescription>
   <versions>
     <version>
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.core</artifactId>
-      <version>3.1.82</version>
+      <version>3.1.86</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
     </dependency>

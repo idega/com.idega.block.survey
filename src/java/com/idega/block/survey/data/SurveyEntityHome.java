@@ -1,11 +1,21 @@
 package com.idega.block.survey.data;
 
 
-public interface SurveyEntityHome extends com.idega.data.IDOHome
-{
- public SurveyEntity create() throws javax.ejb.CreateException;
- public SurveyEntity findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
- public java.util.Collection findActiveSurveys(com.idega.block.category.data.ICInformationFolder p0,java.sql.Timestamp p1)throws javax.ejb.FinderException;
- public java.util.Collection findAllSurveys(com.idega.block.category.data.ICInformationFolder p0)throws javax.ejb.FinderException;
+import java.util.Collection;
+import javax.ejb.CreateException;
+import com.idega.data.IDOHome;
+import javax.ejb.FinderException;
+import com.idega.block.category.data.ICInformationFolder;
+import java.sql.Timestamp;
 
+public interface SurveyEntityHome extends IDOHome {
+	public SurveyEntity create() throws CreateException;
+
+	public SurveyEntity findByPrimaryKey(Object pk) throws FinderException;
+
+	public Collection findAllSurveys(ICInformationFolder folder)
+			throws FinderException;
+
+	public Collection findActiveSurveys(ICInformationFolder folder,
+			Timestamp time) throws FinderException;
 }

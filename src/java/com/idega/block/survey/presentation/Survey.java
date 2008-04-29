@@ -22,6 +22,7 @@ import com.idega.block.survey.business.SurveyBusiness;
 import com.idega.block.survey.business.SurveyBusinessBean;
 import com.idega.block.survey.data.SurveyAnswer;
 import com.idega.block.survey.data.SurveyEntity;
+import com.idega.block.survey.data.SurveyParticipant;
 import com.idega.block.survey.data.SurveyQuestion;
 import com.idega.block.survey.data.SurveyStatus;
 import com.idega.business.IBOLookup;
@@ -303,6 +304,11 @@ public class Survey extends FolderBlock {
 		Set questions = this.reply.keySet();
 		if (questions != null) {
 			String participantKey = StringHandler.getRandomStringNonAmbiguous(20);
+			SurveyParticipant participant = this.sBusiness.createSurveyParticipant(participantKey, this.currentSurvey, iwc.getCurrentUser(), this.currentSurvey.getCanUserAnswerMoreThanOnce());
+			if (!this.currentSurvey.getCanUserAnswerMoreThanOnce()) {
+				this.sBusiness.removeSurveyRepliesForParticipant(this.currentSurvey, participant);
+			}
+			IWTimestamp now = new IWTimestamp();
 			for (Iterator qIter = questions.iterator(); qIter.hasNext();) {
 				Object questionPK = qIter.next();
 				SurveyQuestion question = this.sBusiness.getQuestionHome().findByPrimaryKey(questionPK);
@@ -318,7 +324,7 @@ public class Survey extends FolderBlock {
 							//No answer found...
 						}
 					}
-					this.sBusiness.createSurveyReply(this.currentSurvey, question, participantKey, answer, (String) answerPKAndText[1]);
+					this.sBusiness.createSurveyReply(this.currentSurvey, question, participant, answer, (String) answerPKAndText[1], now);
 				}
 			}
 			if (this.participant != null) {

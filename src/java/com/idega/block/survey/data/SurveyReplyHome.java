@@ -1,13 +1,28 @@
 package com.idega.block.survey.data;
 
 
-public interface SurveyReplyHome extends com.idega.data.IDOHome
-{
- public SurveyReply create() throws javax.ejb.CreateException;
- public SurveyReply findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
- public java.util.Collection findByQuestion(com.idega.block.survey.data.SurveyQuestion p0)throws javax.ejb.FinderException;
- public java.util.Collection findByQuestions(java.util.Collection p0)throws javax.ejb.FinderException;
- public int getCountByQuestion(com.idega.block.survey.data.SurveyQuestion p0)throws com.idega.data.IDOException;
- public int getCountByQuestionAndAnswer(com.idega.block.survey.data.SurveyQuestion p0,com.idega.block.survey.data.SurveyAnswer p1)throws com.idega.data.IDOException;
+import com.idega.data.IDOException;
+import java.util.Collection;
+import javax.ejb.CreateException;
+import com.idega.data.IDOHome;
+import javax.ejb.FinderException;
 
+public interface SurveyReplyHome extends IDOHome {
+	public SurveyReply create() throws CreateException;
+
+	public SurveyReply findByPrimaryKey(Object pk) throws FinderException;
+
+	public Collection findByQuestion(SurveyQuestion question)
+			throws FinderException;
+
+	public Collection findBySurveyAndParticipant(SurveyEntity survey,
+			SurveyParticipant participant) throws FinderException;
+
+	public Collection findByQuestions(Collection questions)
+			throws FinderException;
+
+	public int getCountByQuestionAndAnswer(SurveyQuestion question,
+			SurveyAnswer answer) throws IDOException;
+
+	public int getCountByQuestion(SurveyQuestion question) throws IDOException;
 }

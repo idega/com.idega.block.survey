@@ -1,36 +1,54 @@
 package com.idega.block.survey.data;
 
 
-public class SurveyParticipantHomeImpl extends com.idega.data.IDOFactory implements SurveyParticipantHome
-{
- protected Class getEntityInterfaceClass(){
-  return SurveyParticipant.class;
- }
+import com.idega.data.IDOException;
+import java.util.Collection;
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+import com.idega.user.data.User;
+import com.idega.data.IDOEntity;
+import com.idega.data.IDOFactory;
 
+public class SurveyParticipantHomeImpl extends IDOFactory implements
+		SurveyParticipantHome {
+	public Class getEntityInterfaceClass() {
+		return SurveyParticipant.class;
+	}
 
- public SurveyParticipant create() throws javax.ejb.CreateException{
-  return (SurveyParticipant) super.createIDO();
- }
+	public SurveyParticipant create() throws CreateException {
+		return (SurveyParticipant) super.createIDO();
+	}
 
+	public SurveyParticipant findByPrimaryKey(Object pk) throws FinderException {
+		return (SurveyParticipant) super.findByPrimaryKeyIDO(pk);
+	}
 
-public java.util.Collection findRandomParticipants(com.idega.block.survey.data.SurveyEntity p0,int p1,boolean p2)throws javax.ejb.FinderException{
-	com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
-	java.util.Collection ids = ((SurveyParticipantBMPBean)entity).ejbFindRandomParticipants(p0,p1,p2);
-	this.idoCheckInPooledEntity(entity);
-	return this.getEntityCollectionForPrimaryKeys(ids);
-}
+	public int getNumberOfParticipations(SurveyEntity survey, String name)
+			throws IDOException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		int theReturn = ((SurveyParticipantBMPBean) entity)
+				.ejbHomeGetNumberOfParticipations(survey, name);
+		this.idoCheckInPooledEntity(entity);
+		return theReturn;
+	}
 
- public SurveyParticipant findByPrimaryKey(Object pk) throws javax.ejb.FinderException{
-  return (SurveyParticipant) super.findByPrimaryKeyIDO(pk);
- }
+	public Collection findRandomParticipants(SurveyEntity survey,
+			int maxNumberOfReturnedParticipants, boolean evenChance)
+			throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((SurveyParticipantBMPBean) entity)
+				.ejbFindRandomParticipants(survey,
+						maxNumberOfReturnedParticipants, evenChance);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
 
-
-public int getNumberOfParticipations(com.idega.block.survey.data.SurveyEntity p0,java.lang.String p1)throws com.idega.data.IDOException{
-	com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
-	int theReturn = ((SurveyParticipantBMPBean)entity).ejbHomeGetNumberOfParticipations(p0,p1);
-	this.idoCheckInPooledEntity(entity);
-	return theReturn;
-}
-
-
+	public SurveyParticipant findParticipant(SurveyEntity survey, User user)
+			throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Object pk = ((SurveyParticipantBMPBean) entity).ejbFindParticipant(
+				survey, user);
+		this.idoCheckInPooledEntity(entity);
+		return this.findByPrimaryKey(pk);
+	}
 }

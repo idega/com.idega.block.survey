@@ -41,6 +41,7 @@ public class SurveyEntityBMPBean extends com.idega.data.GenericEntity implements
 	public final static String DELETED = "Y";
 	public final static String NOT_DELETED = "N";
 	private static final String SURVEY_TYPE = "SU_SURVEY_TYPE_ID";
+	protected static final String COLUMN_CAN_ANSWER_MORE_THEN_ONCE = "more_than_once";
 
 	public SurveyEntityBMPBean() {
 		super();
@@ -69,6 +70,7 @@ public class SurveyEntityBMPBean extends com.idega.data.GenericEntity implements
 		this.addManyToOneRelationship(SURVEY_TYPE, SurveyType.class);
 		
 		addManyToManyRelationShip(SurveyQuestion.class, "SU_SURVEY_SURVEY_QUESTION");
+		addAttribute(COLUMN_CAN_ANSWER_MORE_THEN_ONCE, "Can a user answer more than once", Boolean.class);
 	}
 
 	public static String getEntityTableName() {
@@ -144,6 +146,14 @@ public class SurveyEntityBMPBean extends com.idega.data.GenericEntity implements
 		setColumn(getColumnNameEndTime(),time);
 	}
 	
+	public boolean getCanUserAnswerMoreThanOnce() {
+		return getBooleanColumnValue(COLUMN_CAN_ANSWER_MORE_THEN_ONCE, true);
+	}
+
+	public void setCanUserAnswerMoreThanOnce(boolean canAnswerMultipleTimes) {
+		setColumn(COLUMN_CAN_ANSWER_MORE_THEN_ONCE, canAnswerMultipleTimes);
+	}
+
 	public void addQuestion(SurveyQuestion question) throws IDOAddRelationshipException{
 		idoAddTo(question);
 	}
