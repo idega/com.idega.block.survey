@@ -20,7 +20,6 @@ import com.idega.data.GenericEntity;
 import com.idega.data.IDOException;
 import com.idega.data.IDOQuery;
 import com.idega.data.query.MatchCriteria;
-import com.idega.data.query.OR;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
 import com.idega.user.data.User;
@@ -34,8 +33,7 @@ import com.idega.util.ListUtil;
  *         <a href="mailto:gummi@idega.is">Gudmundur Agust Saemundsson</a><br>
  * @version 1.0
  */
-public class SurveyParticipantBMPBean extends GenericEntity implements
-		SurveyParticipant {
+public class SurveyParticipantBMPBean extends GenericEntity implements SurveyParticipant {
 
 	public static final String COLUMN_NAME = "PARTICIPANT_NAME";
 	public static final String COLUMN_SURVEY = "SU_SURVEY_ID";
@@ -70,7 +68,7 @@ public class SurveyParticipantBMPBean extends GenericEntity implements
 	public void setSurvey(SurveyEntity survey) {
 		setColumn(COLUMN_SURVEY, survey);
 	}
-	
+
 	public void setUser(User user) {
 		setColumn(COLUMN_USER, user);
 	}
@@ -78,7 +76,7 @@ public class SurveyParticipantBMPBean extends GenericEntity implements
 	public void setEntryDate(Timestamp entryDate) {
 		setColumn(COLUMN_ENTRY_DATE, entryDate);
 	}
-	
+
 	// getters
 	public String getParticipantName() {
 		return getStringColumnValue(COLUMN_NAME);
@@ -91,14 +89,13 @@ public class SurveyParticipantBMPBean extends GenericEntity implements
 	public User getUser() {
 		return (User) getColumnValue(COLUMN_USER);
 	}
-	
+
 	public Timestamp getEntryDate() {
 		return getTimestampColumnValue(COLUMN_ENTRY_DATE);
 	}
-	
+
 	// ejb
-	public int ejbHomeGetNumberOfParticipations(SurveyEntity survey, String name)
-			throws IDOException {
+	public int ejbHomeGetNumberOfParticipations(SurveyEntity survey, String name) throws IDOException {
 		IDOQuery query = idoQueryGetSelectCount();
 		query.appendWhereEquals(COLUMN_SURVEY, survey);
 		query.appendAndEquals(COLUMN_NAME, name);
@@ -106,9 +103,7 @@ public class SurveyParticipantBMPBean extends GenericEntity implements
 		return idoGetNumberOfRecords(query);
 	}
 
-	public Collection ejbFindRandomParticipants(SurveyEntity survey,
-			int maxNumberOfReturnedParticipants, boolean evenChance)
-			throws FinderException {
+	public Collection ejbFindRandomParticipants(SurveyEntity survey, int maxNumberOfReturnedParticipants, boolean evenChance) throws FinderException {
 		Collection toReturn = new Vector();
 		IDOQuery query = idoQueryGetSelect();
 		query.appendWhereEquals(COLUMN_SURVEY, survey);
@@ -122,7 +117,8 @@ public class SurveyParticipantBMPBean extends GenericEntity implements
 
 		if (pks.size() <= maxNumberOfReturnedParticipants) {
 			return pks;
-		} else {
+		}
+		else {
 
 			Set set = new HashSet();
 
@@ -150,10 +146,9 @@ public class SurveyParticipantBMPBean extends GenericEntity implements
 		}
 		return toReturn;
 	}
-	
-	public Object ejbFindParticipant(SurveyEntity survey, User user)
-			throws FinderException {
-		
+
+	public Object ejbFindParticipant(SurveyEntity survey, User user) throws FinderException {
+
 		Table table = new Table(this);
 
 		SelectQuery query = new SelectQuery(table);

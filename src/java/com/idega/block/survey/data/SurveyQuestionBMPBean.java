@@ -1,6 +1,5 @@
 package com.idega.block.survey.data;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,8 +24,7 @@ import com.idega.util.IWTimestamp;
  * @version 1.0
  */
 
-public class SurveyQuestionBMPBean extends GenericEntity implements
-		SurveyQuestion {
+public class SurveyQuestionBMPBean extends GenericEntity implements SurveyQuestion {
 
 	protected static final String ENTITY_NAME = "SU_SURVEY_QUESTION";
 
@@ -53,8 +51,7 @@ public class SurveyQuestionBMPBean extends GenericEntity implements
 		addAttribute(COLUMN_DELETED, "Deleted", String.class, 1);
 		addManyToOneRelationship(COLUMN_DELETED_BY, User.class);
 		addAttribute(COLUMN_DELETED_WHEN, "Deleted when", Timestamp.class);
-		addManyToOneRelationship(COLUMN_DEPENDANT_ON_QUESTION,
-				SurveyQuestion.class);
+		addManyToOneRelationship(COLUMN_DEPENDANT_ON_QUESTION, SurveyQuestion.class);
 		addAttribute(COLUMN_HAS_DEPENDANT_QUESTIONS, "Has dependant questions", Boolean.class);
 		addAttribute(COLUMN_QUESTION_NUMBER, "Question display number", String.class);
 	}
@@ -67,8 +64,7 @@ public class SurveyQuestionBMPBean extends GenericEntity implements
 		super.store();
 		Collection translations = this.storeMap.values();
 		for (Iterator iter = translations.iterator(); iter.hasNext();) {
-			SurveyQuestionTranslation element = (SurveyQuestionTranslation) iter
-					.next();
+			SurveyQuestionTranslation element = (SurveyQuestionTranslation) iter.next();
 			element.setTransletedEntity(this);
 			element.store();
 		}
@@ -83,16 +79,14 @@ public class SurveyQuestionBMPBean extends GenericEntity implements
 		return (ICLocale) getColumnValue(COLUMNNAME_CREATION_LOCALE);
 	}
 
-	public String getQuestion(ICLocale locale) throws IDOLookupException,
-			FinderException {
-		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome) IDOLookup
-				.getHome(SurveyQuestionTranslation.class);
+	public String getQuestion(ICLocale locale) throws IDOLookupException, FinderException {
+		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome) IDOLookup.getHome(SurveyQuestionTranslation.class);
 		SurveyQuestionTranslation qTR;
 		try {
 			qTR = sqtHome.findQuestionTranslation(this, locale);
-		} catch (FinderException e) {
-			qTR = sqtHome.findQuestionTranslation(this, this
-					.getCreationLocale());
+		}
+		catch (FinderException e) {
+			qTR = sqtHome.findQuestionTranslation(this, this.getCreationLocale());
 		}
 		return qTR.getQuestion();
 	}
@@ -100,28 +94,27 @@ public class SurveyQuestionBMPBean extends GenericEntity implements
 	public SurveyQuestion getDependantOnQuestion() {
 		return (SurveyQuestion) getColumnValue(COLUMN_DEPENDANT_ON_QUESTION);
 	}
-	
+
 	public boolean getHasDependantQuestions() {
 		return getBooleanColumnValue(COLUMN_HAS_DEPENDANT_QUESTIONS, false);
 	}
-	
+
 	public String getQuestionDisplayNumber() {
 		return getStringColumnValue(COLUMN_QUESTION_NUMBER);
 	}
-	
+
 	// setters
 	public void setAnswerType(char value) {
 		setColumn(COLUMN_ANSWER_TYPE, value);
 	}
 
-	public void setQuestion(String question, ICLocale locale)
-			throws IDOLookupException, CreateException {
-		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome) IDOLookup
-				.getHome(SurveyQuestionTranslation.class);
+	public void setQuestion(String question, ICLocale locale) throws IDOLookupException, CreateException {
+		SurveyQuestionTranslationHome sqtHome = (SurveyQuestionTranslationHome) IDOLookup.getHome(SurveyQuestionTranslation.class);
 		SurveyQuestionTranslation qTR = null;
 		try {
 			qTR = sqtHome.findQuestionTranslation(this, locale);
-		} catch (FinderException e) {
+		}
+		catch (FinderException e) {
 			qTR = sqtHome.create();
 			qTR.setLocale(locale);
 			if (this.getCreationLocale() == null) {
@@ -157,14 +150,14 @@ public class SurveyQuestionBMPBean extends GenericEntity implements
 	public void setDependantOnQuestion(SurveyQuestion question) {
 		setColumn(COLUMN_DEPENDANT_ON_QUESTION, question);
 	}
-	
+
 	public void setHasDepandantQuestions(boolean hasDependantQuestions) {
 		setColumn(COLUMN_HAS_DEPENDANT_QUESTIONS, hasDependantQuestions);
 	}
-	
+
 	public void setQuestionDisplayNumber(String displayNumber) {
 		setColumn(COLUMN_QUESTION_NUMBER, displayNumber);
 	}
-	
+
 	// ejb
 }
