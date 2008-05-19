@@ -352,6 +352,8 @@ public class SurveyResultEditor extends Block {
 		Table table = new Table();
 		int row = 1;
 		int column = 2;
+		boolean firstQuestion = true;
+		int columnMove = 0;
 		
 		if (this.questions != null && !this.questions.isEmpty()) {
 			try {
@@ -367,7 +369,12 @@ public class SurveyResultEditor extends Block {
 					}
 					column = ((Integer)question.getPrimaryKey()).intValue();
 
-					table.add(questionName, column++, row);
+					if (firstQuestion) {
+						firstQuestion = false;
+						columnMove = column - 2;
+					}
+					
+					table.add(questionName, column - columnMove, row);
 				}
 
 				row++;
@@ -399,11 +406,19 @@ public class SurveyResultEditor extends Block {
 					String key = (String) iter.next();
 					ArrayList list = (ArrayList) participants.get(key);
 					Iterator it = list.iterator();
+					
+					try {
+						SurveyParticipant participant = this.sBusiness.getSurveyParticipantHome().findParticipantByName(key, this.survey);
+						table.add(participant.getUser().getDisplayName(), 1, row);
+					} catch (Exception e1) {
+						table.add(key, 1, row);
+					}
+					
 					while (it.hasNext()) {
 						SurveyReply reply = (SurveyReply) it.next();
 						column = ((Integer)reply.getQuestion().getPrimaryKey()).intValue();
 						if (reply.getSurveyAnswer() == null) {
-							table.add(reply.getAnswer(), column, row);
+							table.add(reply.getAnswer(), column - columnMove, row);
 						} else {
 							String locAnswer = "";
 							try {
@@ -411,7 +426,7 @@ public class SurveyResultEditor extends Block {
 							} catch (FinderException e) {
 								e.printStackTrace();
 							}
-							table.add(locAnswer, column, row);
+							table.add(locAnswer, column - columnMove, row);
 						}						
 					}
 					

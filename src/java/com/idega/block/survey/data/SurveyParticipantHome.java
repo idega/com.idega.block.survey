@@ -22,4 +22,7 @@ public interface SurveyParticipantHome extends IDOHome {
 
 	public SurveyParticipant findParticipant(SurveyEntity survey, User user)
 			throws FinderException;
+
+	public SurveyParticipant findParticipantByName(String name,
+			SurveyEntity survey) throws FinderException;
 }

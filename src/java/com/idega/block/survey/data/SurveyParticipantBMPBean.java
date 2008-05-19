@@ -158,4 +158,17 @@ public class SurveyParticipantBMPBean extends GenericEntity implements SurveyPar
 
 		return idoFindOnePKByQuery(query);
 	}
+	
+	public Object ejbFindParticipantByName(String name, SurveyEntity survey) throws FinderException {
+
+		Table table = new Table(this);
+
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table.getColumn(getIDColumnName()));
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_SURVEY), MatchCriteria.EQUALS, survey));
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_NAME), MatchCriteria.EQUALS, name));
+
+		return idoFindOnePKByQuery(query);
+	}
+
 }

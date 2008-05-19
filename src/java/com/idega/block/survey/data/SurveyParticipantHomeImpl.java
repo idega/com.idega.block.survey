@@ -51,4 +51,13 @@ public class SurveyParticipantHomeImpl extends IDOFactory implements
 		this.idoCheckInPooledEntity(entity);
 		return this.findByPrimaryKey(pk);
 	}
+
+	public SurveyParticipant findParticipantByName(String name,
+			SurveyEntity survey) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Object pk = ((SurveyParticipantBMPBean) entity)
+				.ejbFindParticipantByName(name, survey);
+		this.idoCheckInPooledEntity(entity);
+		return this.findByPrimaryKey(pk);
+	}
 }

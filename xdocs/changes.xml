@@ -4,6 +4,12 @@
 		<author email="tryggvi@idega.com">Tryggvi Larusson</author>
 	</properties>
 	<body>
+		<release version="3.1.5" date="2008-05-19">
+			<action dev="palli" type="update">
+				Changed excel results to include user that answered and fixed the column layout of the answers.
+			</action>
+		</release>
+
 		<release version="3.1.4" date="2008-04-29">
 			<action dev="palli" type="update">
 				Added dependency between questions, logging of user that answers survey and more.
