@@ -44,8 +44,8 @@ import com.idega.presentation.ui.Legend;
 import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.util.IWTimestamp;
+import com.idega.util.PresentationUtil;
 import com.idega.util.poi.POIUtility;
-import com.idega.util.poi.PresentationUtil;
 
 /**
  * Title: SurveyResult Description: Copyright: Copyright (c) 2004 Company: idega
