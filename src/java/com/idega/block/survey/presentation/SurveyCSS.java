@@ -38,6 +38,7 @@ public class SurveyCSS extends Survey {
 	private String id = null;
 	private ICPage iBackPage;
 	private HashMap dependentRadioButtons = new HashMap();
+	private boolean showDescription = false;
 
 	public SurveyCSS() {
 		super();
@@ -112,6 +113,10 @@ public class SurveyCSS extends Survey {
 
 						Heading1 h1 = new Heading1(this.currentSurvey.getName());
 						l.add(h1);
+						if (showDescription) {
+							Heading2 h2 = new Heading2(this.currentSurvey.getDescription());
+							l.add(h2);							
+						}
 
 						Layer layer = new Layer();
 						layer.setStyleClass("surveySuccess");
@@ -149,6 +154,11 @@ public class SurveyCSS extends Survey {
 
 			Heading1 h1 = new Heading1(this.currentSurvey.getName());
 			l.add(h1);
+			if (showDescription) {
+				Heading2 h2 = new Heading2(this.currentSurvey.getDescription());
+				l.add(h2);							
+			}
+
 
 			ICLocale locale = ICLocaleBusiness.getICLocale(this.iLocaleID);
 			try {
@@ -231,6 +241,11 @@ public class SurveyCSS extends Survey {
 
 			Heading1 h1 = new Heading1(this.currentSurvey.getName());
 			myForm.add(h1);
+			if (showDescription) {
+				Heading2 h2 = new Heading2(this.currentSurvey.getDescription());
+				myForm.add(h2);							
+			}
+
 
 			if (!this.surveyAnswerDifference.isEmpty()) {
 				Layer layer = new Layer();
@@ -492,5 +507,13 @@ public class SurveyCSS extends Survey {
 		public RadioButton getButton() {
 			return this.button;
 		}
+	}
+	
+	public boolean getShowDescription() {
+		return this.showDescription;
+	}
+	
+	public void setShowDescription(boolean showDescription) {
+		this.showDescription = showDescription;
 	}
 }

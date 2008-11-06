@@ -49,6 +49,7 @@ import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
+import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.StringHandler;
 import com.idega.util.datastructures.QueueMap;
@@ -304,7 +305,13 @@ public class Survey extends FolderBlock {
 		Set questions = this.reply.keySet();
 		if (questions != null) {
 			String participantKey = StringHandler.getRandomStringNonAmbiguous(20);
-			SurveyParticipant participant = this.sBusiness.createSurveyParticipant(participantKey, this.currentSurvey, iwc.getCurrentUser(), this.currentSurvey.getCanUserAnswerMoreThanOnce());
+			User currentUser = null;
+			try {
+				currentUser = iwc.getCurrentUser();
+			} catch (Exception e) {
+				currentUser = null;
+			}
+			SurveyParticipant participant = this.sBusiness.createSurveyParticipant(participantKey, this.currentSurvey, currentUser, this.currentSurvey.getCanUserAnswerMoreThanOnce());
 			if (!this.currentSurvey.getCanUserAnswerMoreThanOnce()) {
 				this.sBusiness.removeSurveyRepliesForParticipant(this.currentSurvey, participant);
 			}
