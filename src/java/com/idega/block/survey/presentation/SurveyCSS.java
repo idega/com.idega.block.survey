@@ -32,6 +32,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.RadioButton;
+import com.idega.util.PresentationUtil;
 
 public class SurveyCSS extends Survey {
 
@@ -80,6 +81,7 @@ public class SurveyCSS extends Survey {
 	}
 
 	public void main(IWContext iwc) throws Exception {
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/survey.css"));
 
 		if (this.mode.equals(MODE_EDIT)) {
 			SurveyEditor editor = new SurveyEditor(this.getICObjectInstanceID());

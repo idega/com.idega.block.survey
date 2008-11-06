@@ -45,6 +45,7 @@ import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.util.IWTimestamp;
 import com.idega.util.poi.POIUtility;
+import com.idega.util.poi.PresentationUtil;
 
 /**
  * Title: SurveyResult Description: Copyright: Copyright (c) 2004 Company: idega
@@ -124,6 +125,7 @@ public class SurveyResultEditor extends Block {
 	}
 
 	public void main(IWContext iwc) throws RemoteException {
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/survey.css"));
 
 		if (this.survey != null) {
 			Legend legend = new Legend(this.survey.getName() + " - "
