@@ -1,12 +1,12 @@
 package com.idega.block.survey.data;
 
 
-import com.idega.core.localisation.data.ICLocale;
-import javax.ejb.CreateException;
-import javax.ejb.FinderException;
 import com.idega.data.IDOLookupException;
-import com.idega.user.data.User;
+import javax.ejb.CreateException;
+import com.idega.core.localisation.data.ICLocale;
 import com.idega.data.IDOEntity;
+import com.idega.user.data.User;
+import javax.ejb.FinderException;
 
 public interface SurveyAnswer extends IDOEntity {
 	/**
@@ -62,9 +62,19 @@ public interface SurveyAnswer extends IDOEntity {
 	public boolean getDisableDependantQuestions();
 
 	/**
+	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#getEnableCheckedDepenantQuestions
+	 */
+	public boolean getEnableCheckedDepenantQuestions();
+
+	/**
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#setDisableDepenantQuestions
 	 */
 	public void setDisableDepenantQuestions(boolean disable);
+
+	/**
+	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#setEnableCheckedDepenantQuestions
+	 */
+	public void setEnableCheckedDepenantQuestions(boolean enable);
 
 	/**
 	 * @see com.idega.block.survey.data.SurveyAnswerBMPBean#store

@@ -668,7 +668,7 @@ public class Survey extends FolderBlock {
 	/**
 	 * @return
 	 */
-	protected PresentationObject getAnswerTextArea(Object name) {
+	protected TextArea getAnswerTextArea(Object name) {
 		TextArea aTA = new TextArea(PRM_ANSWER_IN_TEXT_AREA_PREFIX + name);
 		//aTA.setStyleAttribute(style_form_element);
 

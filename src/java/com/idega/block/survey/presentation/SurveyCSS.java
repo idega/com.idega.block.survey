@@ -28,10 +28,12 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.RadioButton;
+import com.idega.presentation.ui.TextArea;
 import com.idega.util.PresentationUtil;
 
 public class SurveyCSS extends Survey {
@@ -39,6 +41,7 @@ public class SurveyCSS extends Survey {
 	private String id = null;
 	private ICPage iBackPage;
 	private HashMap dependentRadioButtons = new HashMap();
+	private HashMap dependentCheckBoxes = new HashMap();
 	private boolean showDescription = false;
 
 	public SurveyCSS() {
@@ -357,22 +360,40 @@ public class SurveyCSS extends Survey {
 				ListItem li = new ListItem();
 				lists.add(li);
 				li.add(new HiddenInput(PRM_SELECTION_PREFIX + question.getPrimaryKey().toString(), question.getPrimaryKey().toString()));
-				li.add(getAnswerTextArea(question.getPrimaryKey()));
+				TextArea area = getAnswerTextArea(question.getPrimaryKey()); 
+				li.add(area);
 				
 				if (question.getDependantOnQuestion() != null) {
-					ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(question.getDependantOnQuestion().getPrimaryKey());
-					if (buttons != null) {
-						Iterator it = buttons.iterator();
-						while (it.hasNext()) {
-							DependantRadioButtonHolder holder = (DependantRadioButtonHolder) it.next();
-							if (holder.getAnswer().getDisableDependantQuestions()) {
-								holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), true);								
-							} else {
-								holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), false);																
+					if (question.getDependantOnQuestion().getAnswerType() == SurveyBusinessBean.ANSWERTYPE_MULTI_CHOICE) {
+						area.setDisabled(true);
+						ArrayList checkBoxes = (ArrayList) this.dependentCheckBoxes.get(question.getDependantOnQuestion().getPrimaryKey());
+						if (checkBoxes != null) {
+							Iterator it = checkBoxes.iterator();
+							while (it.hasNext()) {
+								DependantCheckBoxHolder holder = (DependantCheckBoxHolder) it.next();
+								if (holder.getAnswer().getEnableCheckedDepenantQuestions()) {
+									holder.getCheckBox().setToEnableWhenChecked(area);																
+									holder.getCheckBox().setToDisableWhenUnchecked(area);								
+								} 
+								
+								//checkParent(holder, PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey());
 							}
-							
-							checkParent(holder, PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey());
-						}
+						}												
+					} else {
+						ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(question.getDependantOnQuestion().getPrimaryKey());
+						if (buttons != null) {
+							Iterator it = buttons.iterator();
+							while (it.hasNext()) {
+								DependantRadioButtonHolder holder = (DependantRadioButtonHolder) it.next();
+								if (holder.getAnswer().getDisableDependantQuestions()) {
+									holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), true);								
+								} else {
+									holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), false);																
+								}
+								
+								checkParent(holder, PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey());
+							}
+						}						
 					}
 				}
 			}
@@ -414,7 +435,22 @@ public class SurveyCSS extends Survey {
 
 							case SurveyBusinessBean.ANSWERTYPE_MULTI_CHOICE:
 								lists.setStyleClass("checkbox");
-								li.add(getCheckBox(question.getPrimaryKey(), answer.getPrimaryKey()));
+								PresentationObject checkBox = getCheckBox(question.getPrimaryKey(), answer.getPrimaryKey());
+
+								li.add(checkBox);
+								
+								if (question.getHasDependantQuestions()) {
+									ArrayList checkBoxes = null;
+									if (this.dependentCheckBoxes.containsKey(question.getPrimaryKey())) {
+										checkBoxes = (ArrayList) this.dependentCheckBoxes.get(question.getPrimaryKey());
+									} else {
+										checkBoxes = new ArrayList();
+									}
+									
+									checkBoxes.add(new DependantCheckBoxHolder(question, answer, (CheckBox)checkBox));
+									this.dependentCheckBoxes.put(question.getPrimaryKey(), checkBoxes);
+								}
+
 								break;
 						}
 					}
@@ -510,6 +546,31 @@ public class SurveyCSS extends Survey {
 			return this.button;
 		}
 	}
+
+	private class DependantCheckBoxHolder {
+		protected CheckBox checkbox = null;
+		protected SurveyQuestion question = null;
+		protected SurveyAnswer answer = null;
+		
+		public DependantCheckBoxHolder(SurveyQuestion question, SurveyAnswer answer, CheckBox checkbox) {
+			this.question = question;
+			this.answer = answer;
+			this.checkbox = checkbox;
+		}
+		
+		public SurveyAnswer getAnswer() {
+			return this.answer;
+		}
+		
+		public SurveyQuestion getQuestion() {
+			return this.question;
+		}
+		
+		public CheckBox getCheckBox() {
+			return this.checkbox;
+		}
+	}
+
 	
 	public boolean getShowDescription() {
 		return this.showDescription;

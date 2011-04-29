@@ -1,10 +1,10 @@
 package com.idega.block.survey.data;
 
 
-import java.util.Collection;
 import javax.ejb.CreateException;
 import com.idega.data.IDOHome;
 import javax.ejb.FinderException;
+import java.util.Collection;
 
 public interface SurveyAnswerHome extends IDOHome {
 	public SurveyAnswer create() throws CreateException;
