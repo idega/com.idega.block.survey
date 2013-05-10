@@ -95,7 +95,7 @@ public class SurveyCSS extends Survey {
 			add(editor);
 		}
 		else {
-			if (this.hasEditPermission()) {
+			if (iwc.isSuperAdmin() || iwc.hasRole("survey_admin")) {
 				add(getAdminPart());
 				if (this.showHelp) {
 					add(getHelp("su_help_survey"));
