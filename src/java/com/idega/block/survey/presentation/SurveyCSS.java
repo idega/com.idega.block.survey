@@ -48,6 +48,7 @@ public class SurveyCSS extends Survey {
 		super();
 	}
 
+	@Override
 	protected Table getAdminPart() {
 		Table table = new Table();
 		table.setCellpadding(0);
@@ -83,6 +84,7 @@ public class SurveyCSS extends Survey {
 		return table;
 	}
 
+	@Override
 	public void main(IWContext iwc) throws Exception {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/survey.css"));
 
@@ -120,7 +122,7 @@ public class SurveyCSS extends Survey {
 						l.add(h1);
 						if (showDescription) {
 							Heading2 h2 = new Heading2(this.currentSurvey.getDescription());
-							l.add(h2);							
+							l.add(h2);
 						}
 
 						Layer layer = new Layer();
@@ -147,6 +149,7 @@ public class SurveyCSS extends Survey {
 		}
 	}
 
+	@Override
 	public void setId(String id) {
 		//		this.id = id;
 	}
@@ -161,7 +164,7 @@ public class SurveyCSS extends Survey {
 			l.add(h1);
 			if (showDescription) {
 				Heading2 h2 = new Heading2(this.currentSurvey.getDescription());
-				l.add(h2);							
+				l.add(h2);
 			}
 
 
@@ -223,12 +226,12 @@ public class SurveyCSS extends Survey {
 			legend.add(right);
 
 			l.add(legend);
-			//myForm.add(surveyTable);		
 		}
 
 		return l;
 	}
 
+	@Override
 	protected PresentationObject getSurveyPresentation(IWContext iwc) {
 		Form myForm = new Form();
 		if (this.resultPage != null) {
@@ -248,7 +251,7 @@ public class SurveyCSS extends Survey {
 			myForm.add(h1);
 			if (showDescription) {
 				Heading2 h2 = new Heading2(this.currentSurvey.getDescription());
-				myForm.add(h2);							
+				myForm.add(h2);
 			}
 
 
@@ -280,7 +283,7 @@ public class SurveyCSS extends Survey {
 					if (question.getQuestionDisplayNumber() != null) {
 						headingText = question.getQuestionDisplayNumber() + " ";
 					}
-					
+
 					Heading2 h2 = new Heading2(headingText);
 					try {
 						h2 = new Heading2(headingText + question.getQuestion(locale));
@@ -303,8 +306,9 @@ public class SurveyCSS extends Survey {
 				Layer sL = new Layer(Layer.SPAN);
 				sL.add(this.iwrb.getLocalizedString("submit", "Submit"));
 				Link submitLink = new Link(sL);
-				submitLink.setFormToSubmit(myForm, false);
-				myForm.addParameter(PRM_ACTION, String.valueOf(ACTION_SURVEYREPLY));
+				submitLink.setURL("javascript:void(0);");
+				myForm.add(new HiddenInput(PRM_ACTION, String.valueOf(ACTION_SURVEYREPLY)));
+				submitLink.setOnClick("document.getElementById('" + myForm.getId() + "').submit();");
 				submit.add(submitLink);
 
 				myForm.add(submit);
@@ -313,7 +317,6 @@ public class SurveyCSS extends Survey {
 			catch (IDORelationshipException e) {
 				e.printStackTrace();
 			}
-			//myForm.add(surveyTable);		
 		}
 		else {
 			Layer l = new Layer();
@@ -337,21 +340,21 @@ public class SurveyCSS extends Survey {
 				while (it.hasNext()) {
 					DependantRadioButtonHolder holder2 = (DependantRadioButtonHolder) it.next();
 					if (holder2.getAnswer().getDisableDependantQuestions()) {
-						holder2.getButton().setToDisableOnClick(disableName, true);								
+						holder2.getButton().setToDisableOnClick(disableName, true);
 					} else {
-						holder2.getButton().setToDisableOnClick(disableName, false);																
+						holder2.getButton().setToDisableOnClick(disableName, false);
 					}
-					
+
 					checkParent(holder2, disableName);
 				}
-			}			
+			}
 		}
 	}
-	
+
 	private Layer getAnswerLayer(IWContext iwc, SurveyQuestion question, ICLocale locale, boolean results) {
 		Layer aL = new Layer(Layer.DIV);
 		aL.setStyleClass("survey_answers");
-		
+
 		try {
 			if (question.getAnswerType() == SurveyBusinessBean.ANSWERTYPE_TEXTAREA) {
 				Lists lists = new Lists();
@@ -360,9 +363,9 @@ public class SurveyCSS extends Survey {
 				ListItem li = new ListItem();
 				lists.add(li);
 				li.add(new HiddenInput(PRM_SELECTION_PREFIX + question.getPrimaryKey().toString(), question.getPrimaryKey().toString()));
-				TextArea area = getAnswerTextArea(question.getPrimaryKey()); 
+				TextArea area = getAnswerTextArea(question.getPrimaryKey());
 				li.add(area);
-				
+
 				if (question.getDependantOnQuestion() != null) {
 					if (question.getDependantOnQuestion().getAnswerType() == SurveyBusinessBean.ANSWERTYPE_MULTI_CHOICE) {
 						area.setDisabled(true);
@@ -372,13 +375,13 @@ public class SurveyCSS extends Survey {
 							while (it.hasNext()) {
 								DependantCheckBoxHolder holder = (DependantCheckBoxHolder) it.next();
 								if (holder.getAnswer().getEnableCheckedDepenantQuestions()) {
-									holder.getCheckBox().setToEnableWhenChecked(area);																
-									holder.getCheckBox().setToDisableWhenUnchecked(area);								
-								} 
-								
+									holder.getCheckBox().setToEnableWhenChecked(area);
+									holder.getCheckBox().setToDisableWhenUnchecked(area);
+								}
+
 								//checkParent(holder, PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey());
 							}
-						}												
+						}
 					} else {
 						ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(question.getDependantOnQuestion().getPrimaryKey());
 						if (buttons != null) {
@@ -386,14 +389,14 @@ public class SurveyCSS extends Survey {
 							while (it.hasNext()) {
 								DependantRadioButtonHolder holder = (DependantRadioButtonHolder) it.next();
 								if (holder.getAnswer().getDisableDependantQuestions()) {
-									holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), true);								
+									holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), true);
 								} else {
-									holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), false);																
+									holder.getButton().setToDisableOnClick(PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey(), false);
 								}
-								
+
 								checkParent(holder, PRM_ANSWER_IN_TEXT_AREA_PREFIX + question.getPrimaryKey());
 							}
-						}						
+						}
 					}
 				}
 			}
@@ -426,11 +429,11 @@ public class SurveyCSS extends Survey {
 									} else {
 										buttons = new ArrayList();
 									}
-									
+
 									buttons.add(new DependantRadioButtonHolder(question, answer, (RadioButton)button));
 									this.dependentRadioButtons.put(question.getPrimaryKey(), buttons);
 								}
-								
+
 								break;
 
 							case SurveyBusinessBean.ANSWERTYPE_MULTI_CHOICE:
@@ -438,7 +441,7 @@ public class SurveyCSS extends Survey {
 								PresentationObject checkBox = getCheckBox(question.getPrimaryKey(), answer.getPrimaryKey());
 
 								li.add(checkBox);
-								
+
 								if (question.getHasDependantQuestions()) {
 									ArrayList checkBoxes = null;
 									if (this.dependentCheckBoxes.containsKey(question.getPrimaryKey())) {
@@ -446,7 +449,7 @@ public class SurveyCSS extends Survey {
 									} else {
 										checkBoxes = new ArrayList();
 									}
-									
+
 									checkBoxes.add(new DependantCheckBoxHolder(question, answer, (CheckBox)checkBox));
 									this.dependentCheckBoxes.put(question.getPrimaryKey(), checkBoxes);
 								}
@@ -456,7 +459,7 @@ public class SurveyCSS extends Survey {
 					}
 
 					try {
-						//add the option that TextInput is added  
+						//add the option that TextInput is added
 						Layer l = new Layer(Layer.SPAN);
 						if (results) {
 							boolean correct = answer.getIsCorrectAnswer();
@@ -481,7 +484,7 @@ public class SurveyCSS extends Survey {
 					catch (FinderException e1) {
 						e1.printStackTrace();
 					}
-					
+
 					if (question.getDependantOnQuestion() != null) {
 						ArrayList buttons = (ArrayList) this.dependentRadioButtons.get(question.getDependantOnQuestion().getPrimaryKey());
 						if (buttons != null) {
@@ -489,11 +492,11 @@ public class SurveyCSS extends Survey {
 							while (it.hasNext()) {
 								DependantRadioButtonHolder holder = (DependantRadioButtonHolder) it.next();
 								if (holder.getAnswer().getDisableDependantQuestions()) {
-									holder.getButton().setToDisableOnClick(PRM_SELECTION_PREFIX + question.getPrimaryKey(), true);								
+									holder.getButton().setToDisableOnClick(PRM_SELECTION_PREFIX + question.getPrimaryKey(), true);
 								} else {
-									holder.getButton().setToDisableOnClick(PRM_SELECTION_PREFIX + question.getPrimaryKey(), false);																
+									holder.getButton().setToDisableOnClick(PRM_SELECTION_PREFIX + question.getPrimaryKey(), false);
 								}
-								
+
 								checkParent(holder, PRM_SELECTION_PREFIX + question.getPrimaryKey());
 							}
 						}
@@ -522,26 +525,26 @@ public class SurveyCSS extends Survey {
 		this.iBackPage = backPage;
 	}
 
-	
+
 	private class DependantRadioButtonHolder {
 		protected RadioButton button = null;
 		protected SurveyQuestion question = null;
 		protected SurveyAnswer answer = null;
-		
+
 		public DependantRadioButtonHolder(SurveyQuestion question, SurveyAnswer answer, RadioButton button) {
 			this.question = question;
 			this.answer = answer;
 			this.button = button;
 		}
-		
+
 		public SurveyAnswer getAnswer() {
 			return this.answer;
 		}
-		
+
 		public SurveyQuestion getQuestion() {
 			return this.question;
 		}
-		
+
 		public RadioButton getButton() {
 			return this.button;
 		}
@@ -551,32 +554,33 @@ public class SurveyCSS extends Survey {
 		protected CheckBox checkbox = null;
 		protected SurveyQuestion question = null;
 		protected SurveyAnswer answer = null;
-		
+
 		public DependantCheckBoxHolder(SurveyQuestion question, SurveyAnswer answer, CheckBox checkbox) {
 			this.question = question;
 			this.answer = answer;
 			this.checkbox = checkbox;
 		}
-		
+
 		public SurveyAnswer getAnswer() {
 			return this.answer;
 		}
-		
+
 		public SurveyQuestion getQuestion() {
 			return this.question;
 		}
-		
+
 		public CheckBox getCheckBox() {
 			return this.checkbox;
 		}
 	}
 
-	
+
 	public boolean getShowDescription() {
 		return this.showDescription;
 	}
-	
+
 	public void setShowDescription(boolean showDescription) {
 		this.showDescription = showDescription;
 	}
+
 }

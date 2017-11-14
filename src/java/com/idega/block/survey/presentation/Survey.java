@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -57,12 +58,12 @@ import com.idega.util.datastructures.QueueMap;
 /**
  * Title: Survey Description: Copyright: Copyright (c) 2003 Company: idega
  * Software
- * 
+ *
  * @author 2003 - idega team - <br>
  *         <a href="mailto:gummi@idega.is">Gudmundur Agust Saemundsson</a><br>
  * @version 1.0
- * 
- * 
+ *
+ *
  * Survey does only utilise folders not categories in the FolderBlock system at
  * this time
  */
@@ -132,19 +133,23 @@ public class Survey extends FolderBlock {
 	protected boolean showIdentificationState = true;
 	protected String participant = null;
 
+	private String surveyId = null;
+
 	public Survey() {
 		super();
 		this.useLocalizedFolders(false);
 		this.utiliseCategories(false);
 	}
 
+	@Override
 	public String getBundleIdentifier() {
 		return IW_BUNDLE_IDENTIFIER;
 	}
 
+	@Override
 	public void initializeInMain(IWContext iwc) throws Exception {
 		super.initializeInMain(iwc);
-		this.sBusiness = (SurveyBusiness) IBOLookup.getServiceInstance(iwc, SurveyBusiness.class);
+		this.sBusiness = IBOLookup.getServiceInstance(iwc, SurveyBusiness.class);
 		this.iwrb = getResourceBundle(iwc);
 		this.iwb = iwc.getIWMainApplication().getBundle(IW_CORE_BUNDLE_IDENTIFIER);
 		this.iwbSurvey = getBundle(iwc);
@@ -155,8 +160,12 @@ public class Survey extends FolderBlock {
 
 	private void initializeSurvey(IWContext iwc) throws IDOLookupException, RemoteException, FinderException {
 		String sSid = iwc.getParameter(PRM_SURVEY_ID);
-		if (sSid == null) {
+		if (!StringHandler.isNumeric(sSid)) {
+			sSid = getSurveyId();
+		}
+		if (!StringHandler.isNumeric(sSid)) {
 			Collection surveys = this.sBusiness.getSurveyHome().findActiveSurveys(this.getWorkFolder().getEntity(), IWTimestamp.RightNow().getTimestamp());
+			getLogger().warning("Survey ID is unknown, will use first from the list: " + surveys);
 			Iterator surveysIter = surveys.iterator();
 			// TODO change
 			while (surveysIter.hasNext()) {
@@ -164,7 +173,19 @@ public class Survey extends FolderBlock {
 			}
 		}
 		else {
-			this.currentSurvey = this.sBusiness.getSurveyHome().findByPrimaryKey(new Integer(sSid));
+			setSurvey(sSid);
+		}
+	}
+
+	public void setSurvey(String id) {
+		if (StringHandler.isNumeric(id)) {
+			try {
+				this.currentSurvey = this.sBusiness.getSurveyHome().findByPrimaryKey(Integer.valueOf(id));
+			} catch (Exception e) {
+				getLogger().log(Level.WARNING, "Error loading survey by ID: " + id, e);
+			}
+		} else {
+			getLogger().warning("Invalid ID: " + id);
 		}
 	}
 
@@ -241,6 +262,7 @@ public class Survey extends FolderBlock {
 		this.surveyAnswerDifference = allQuestions;
 	}
 
+	@Override
 	public void main(IWContext iwc) throws Exception {
 		if (this.mode.equals(MODE_EDIT)) {
 			SurveyEditor editor = new SurveyEditor(this.getICObjectInstanceID());
@@ -569,7 +591,7 @@ public class Survey extends FolderBlock {
 					}
 
 					try {
-						//add the option that TextInput is added  
+						//add the option that TextInput is added
 						answerTable.add(getAnswerTextObject(answer.getAnswer(locale)), 2, answerNumber);
 					}
 					catch (IDOLookupException e1) {
@@ -772,6 +794,7 @@ public class Survey extends FolderBlock {
 		return table;
 	}
 
+	@Override
 	public synchronized Object clone() {
 		Survey clone = (Survey) super.clone();
 		clone.reply = new QueueMap();
@@ -883,6 +906,14 @@ public class Survey extends FolderBlock {
 
 	public void setResultPage(ICPage resultPage) {
 		this.resultPage = resultPage;
+	}
+
+	public String getSurveyId() {
+		return surveyId;
+	}
+
+	public void setSurveyId(String surveyId) {
+		this.surveyId = surveyId;
 	}
 
 }
